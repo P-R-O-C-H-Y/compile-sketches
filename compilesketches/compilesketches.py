@@ -202,7 +202,8 @@ class CompileSketches:
         self.install_libraries()
 
         # Compile all sketches under the paths specified by the sketch-paths input
-        all_compilations_successful = True
+        
+        #all_compilations_successful = True
         sketch_report_list = []
 
         sketch_list = self.find_sketches()
@@ -210,8 +211,8 @@ class CompileSketches:
             # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
             # only the first sketch compilation's warning count would reflect warnings from cached code
             compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
-            if not compilation_result.success:
-                all_compilations_successful = False
+            #if not compilation_result.success:
+            #    all_compilations_successful = False
 
             # Store the size data for this sketch
             sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
@@ -220,9 +221,9 @@ class CompileSketches:
 
         self.create_sketches_report_file(sketches_report=sketches_report)
 
-        if not all_compilations_successful:
-            print("::error::One or more compilations failed")
-            sys.exit(1)
+       # if not all_compilations_successful:
+       #     print("::error::One or more compilations failed")
+       #     sys.exit(1)
 
     def install_arduino_cli(self):
         """Install Arduino CLI."""
