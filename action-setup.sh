@@ -42,5 +42,5 @@ sudo apt-get install --yes python${PYTHON_PACKAGE_VERSION}-venv > /dev/null
 
 # Set outputs for use in GitHub Actions workflow steps
 # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
-echo "::set-output name=python-command::$PYTHON_COMMAND"
-echo "::set-output name=python-venv-activate-script-path::$PYTHON_VENV_ACTIVATE_SCRIPT_PATH"
+echo "python-command=$PYTHON_COMMAND" >> $GITHUB_OUTPUT
+echo "python-venv-activate-script-path=$PYTHON_VENV_ACTIVATE_SCRIPT_PATH" >> $GITHUB_OUTPUT
