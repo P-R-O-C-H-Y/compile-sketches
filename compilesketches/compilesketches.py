@@ -965,7 +965,8 @@ class CompileSketches:
         # Add global data for sketch to report
         sketch_report = {
             self.ReportKeys.name: str(path_relative_to_workspace(path=compilation_result.sketch)),
-            self.ReportKeys.compilation_success: compilation_result.success,
+            self.ReportKeys.compilation_success: self.get_compilation_result(compilation_result.success,
+                                                                             previous_compilation_result.success),
             self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
                                                          previous_sizes=previous_sizes),
         }
@@ -1085,7 +1086,7 @@ class CompileSketches:
 
         return warning_count
 
-    def do_deltas_report(self, compilation_result, current_sizes, current_warnings):
+    def do_deltas_report(self, current_sizes, current_warnings):
         """Return whether size deltas reporting is enabled.
 
         Keyword arguments:
@@ -1095,7 +1096,6 @@ class CompileSketches:
         """
         return (
             self.enable_deltas_report
-            and compilation_result.success
             and (
                 any(size.get(self.ReportKeys.absolute) != self.not_applicable_indicator for
                     size in current_sizes)
@@ -1231,6 +1231,27 @@ class CompileSketches:
             }
 
         return warnings_report
+
+    def get_compilation_result(self, current_compilation, previous_compilation):
+        """Return a dictionary containing the compiler warning counts.
+
+        Keyword arguments:
+        current_compilation -- compiler result at the head ref
+        previous_compilation -- compiler result at the base ref, or None if the size deltas feature is not enabled
+        """
+        compilation_report = {
+            self.ReportKeys.current: {
+                self.ReportKeys.absolute: current_compilation.success,
+            }
+        }
+
+        if previous_compilation is not None:
+            # Deltas reports are enabled
+            compilation_report[self.ReportKeys.previous] = {
+                self.ReportKeys.absolute: previous_compilation.success
+            }
+
+        return compilation_report
 
     def get_sketches_report(self, sketch_report_list):
         """Return the dictionary containing data on all sketch compilations for each board
