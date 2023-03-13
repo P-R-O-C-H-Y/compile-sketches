@@ -937,8 +937,7 @@ class CompileSketches:
             current_warning_count = None
         previous_sizes = None
         previous_warning_count = None
-        if self.do_deltas_report(compilation_result=compilation_result,
-                                 current_sizes=current_sizes,
+        if self.do_deltas_report(current_sizes=current_sizes,
                                  current_warnings=current_warning_count):
             # Get data for the sketch at the base ref
             # Get the head ref
@@ -965,7 +964,7 @@ class CompileSketches:
         # Add global data for sketch to report
         sketch_report = {
             self.ReportKeys.name: str(path_relative_to_workspace(path=compilation_result.sketch)),
-            self.ReportKeys.compilation_success: self.get_compilation_result(compilation_result.success,
+            self.ReportKeys.compilation_success: self.get_compilation_result(compilation_result.success, 
                                                                              previous_compilation_result.success),
             self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
                                                          previous_sizes=previous_sizes),
