@@ -966,9 +966,9 @@ class CompileSketches:
         sketch_report = {
             self.ReportKeys.name: str(path_relative_to_workspace(path=compilation_result.sketch)),
             self.ReportKeys.compilation_success: compilation_result.success,
-            #self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
-            #                                             previous_sizes=previous_sizes),
             self.ReportKeys.warnings: current_warning_count,
+                        #self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
+            #                                             previous_sizes=previous_sizes),
         }
         #if self.enable_warnings_report:
         #    sketch_report[self.ReportKeys.warnings] = (
