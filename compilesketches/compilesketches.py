@@ -1231,7 +1231,7 @@ class CompileSketches:
 
         return warnings_report
 
-    def get_compilation_result(self, current_compilation, previous_compilation):
+    def get_compilation_result(self, current_compilation_result, previous_compilation_result):
         """Return a dictionary containing the compiler warning counts.
 
         Keyword arguments:
@@ -1240,14 +1240,14 @@ class CompileSketches:
         """
         compilation_report = {
             self.ReportKeys.current: {
-                self.ReportKeys.absolute: current_compilation.success,
+                self.ReportKeys.absolute: current_compilation_result,
             }
         }
 
-        if previous_compilation is not None:
+        if previous_compilation_result is not None:
             # Deltas reports are enabled
             compilation_report[self.ReportKeys.previous] = {
-                self.ReportKeys.absolute: previous_compilation.success
+                self.ReportKeys.absolute: previous_compilation_result
             }
 
         return compilation_report
