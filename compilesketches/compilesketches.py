@@ -937,9 +937,9 @@ class CompileSketches:
             current_warning_count = None
         #previous_sizes = None
         #previous_warning_count = None
-        if self.do_deltas_report(compilation_result=compilation_result,
-                                 current_sizes=current_sizes,
-                                 current_warnings=current_warning_count):
+        #if self.do_deltas_report(compilation_result=compilation_result,
+        #                         current_sizes=current_sizes,
+        #                         current_warnings=current_warning_count):
             # Get data for the sketch at the base ref
             # Get the head ref
             #repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
