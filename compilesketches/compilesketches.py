@@ -49,7 +49,6 @@ def main():
         cli_compile_flags=os.environ["INPUT_CLI-COMPILE-FLAGS"],
         verbose=os.environ["INPUT_VERBOSE"],
         github_token=os.environ["INPUT_GITHUB-TOKEN"],
-        enable_deltas_report=os.environ["INPUT_ENABLE-DELTAS-REPORT"],
         enable_warnings_report=os.environ["INPUT_ENABLE-WARNINGS-REPORT"],
         sketches_report_path=os.environ["INPUT_SKETCHES-REPORT-PATH"]
     )
@@ -71,8 +70,6 @@ class CompileSketches:
     cli_compile_flags -- Arbitrary Arduino CLI flags to add to the compile command.
     verbose -- set to "true" for verbose output ("true", "false")
     github_token -- GitHub access token
-    enable_deltas_report -- set to "true" to cause the action to determine the change in memory usage
-                                 ("true", "false")
     enable_warnings_report -- set to "true" to cause the action to add compiler warning count to the sketches report
                                  ("true", "false")
     sketches_report_path -- folder to save the sketches report to
@@ -100,16 +97,16 @@ class CompileSketches:
         commit_hash = "commit_hash"
         commit_url = "commit_url"
         compilation_success = "compilation_success"
-        sizes = "sizes"
+        #sizes = "sizes"
         warnings = "warnings"
         name = "name"
-        absolute = "absolute"
-        relative = "relative"
-        current = "current"
-        previous = "previous"
-        delta = "delta"
-        minimum = "minimum"
-        maximum = "maximum"
+        #absolute = "absolute"
+        #current = "current"
+        #relative = "relative"
+        #previous = "previous"
+        #delta = "delta"
+        #minimum = "minimum"
+        #maximum = "maximum"
         sketches = "sketches"
 
     dependency_name_key = "name"
@@ -121,7 +118,7 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path):
+                 github_token, enable_warnings_report, sketches_report_path):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
@@ -135,21 +132,13 @@ class CompileSketches:
         sketch_paths = get_list_from_multiformat_input(input_value=sketch_paths)
         absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in sketch_paths.value]
         self.sketch_paths = absolute_sketch_paths
-
         self.cli_compile_flags = yaml.load(stream=cli_compile_flags, Loader=yaml.SafeLoader)
         self.verbose = parse_boolean_input(boolean_input=verbose)
-
         if github_token == "":
             # Access token is not needed for public repositories
             self.github_api = github.Github()
         else:
             self.github_api = github.Github(login_or_token=github_token)
-
-        self.enable_deltas_report = parse_boolean_input(boolean_input=enable_deltas_report)
-        # The enable-deltas-report input has a default value so it should always be either True or False
-        if self.enable_deltas_report is None:
-            print("::error::Invalid value for enable-deltas-report input")
-            sys.exit(1)
 
         self.enable_warnings_report = parse_boolean_input(boolean_input=enable_warnings_report)
         # The enable-deltas-report input has a default value so it should always be either True or False
@@ -157,7 +146,7 @@ class CompileSketches:
             print("::error::Invalid value for enable-warnings-report input")
             sys.exit(1)
 
-        if self.enable_deltas_report:
+        if self.enable_warnings_report:
             self.deltas_base_ref = self.get_deltas_base_ref()
         else:
             # If deltas reports are not enabled, there is no use for the base ref and it could result in an GitHub API
@@ -930,50 +919,49 @@ class CompileSketches:
         Keyword arguments:
         compilation_result -- object returned by compile_sketch()
         """
-        current_sizes = self.get_sizes_from_output(compilation_result=compilation_result)
+        #current_sizes = self.get_sizes_from_output(compilation_result=compilation_result)
         if self.enable_warnings_report:
             current_warning_count = self.get_warning_count_from_output(compilation_result=compilation_result)
         else:
             current_warning_count = None
-        previous_sizes = None
-        previous_warning_count = None
-        if self.do_deltas_report(compilation_result=compilation_result,
-                                 current_sizes=current_sizes,
-                                 current_warnings=current_warning_count):
+        #previous_sizes = None
+        #previous_warning_count = None
+        #if self.do_deltas_report(compilation_result=compilation_result,
+        #                         current_sizes=current_sizes,
+        #                         current_warnings=current_warning_count):
             # Get data for the sketch at the base ref
             # Get the head ref
-            repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
-            original_git_ref = repository.head.object.hexsha
+            #repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
+            #original_git_ref = repository.head.object.hexsha
 
             # git checkout the base ref
-            self.checkout_deltas_base_ref()
+            #self.checkout_deltas_base_ref()
 
             # Compile the sketch again
-            print("Compiling previous version of sketch to determine memory usage change")
-            previous_compilation_result = self.compile_sketch(sketch_path=compilation_result.sketch,
-                                                              clean_build_cache=self.enable_warnings_report)
+            #print("Compiling previous version of sketch to determine memory usage change")
+            #previous_compilation_result = self.compile_sketch(sketch_path=compilation_result.sketch,
+             #                                                 clean_build_cache=self.enable_warnings_report)
 
             # git checkout the head ref to return the repository to its previous state
-            repository.git.checkout(original_git_ref, recurse_submodules=True)
+            #repository.git.checkout(original_git_ref, recurse_submodules=True)
 
-            previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
-            if self.enable_warnings_report:
-                previous_warning_count = (
-                    self.get_warning_count_from_output(compilation_result=previous_compilation_result)
-                )
+            #previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
+            #if self.enable_warnings_report:
+            #    previous_warning_count = (
+            #        self.get_warning_count_from_output(compilation_result=previous_compilation_result)
+            #    )
 
         # Add global data for sketch to report
         sketch_report = {
             self.ReportKeys.name: str(path_relative_to_workspace(path=compilation_result.sketch)),
             self.ReportKeys.compilation_success: compilation_result.success,
-            self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
-                                                         previous_sizes=previous_sizes),
+            self.ReportKeys.warnings: current_warning_count
         }
-        if self.enable_warnings_report:
-            sketch_report[self.ReportKeys.warnings] = (
-                self.get_warnings_report(current_warnings=current_warning_count,
-                                         previous_warnings=previous_warning_count)
-            )
+        #if self.enable_warnings_report:
+        #    sketch_report[self.ReportKeys.warnings] = (
+        #        self.get_warnings_report(current_warnings=current_warning_count,
+        #                                 previous_warnings=previous_warning_count)
+        #    )
 
         return sketch_report
 
@@ -1085,117 +1073,6 @@ class CompileSketches:
 
         return warning_count
 
-    def do_deltas_report(self, compilation_result, current_sizes, current_warnings):
-        """Return whether size deltas reporting is enabled.
-
-        Keyword arguments:
-        compilation_result -- object returned by compile_sketch()
-        current_sizes -- memory usage data from the compilation
-        current_warnings -- compiler warning count
-        """
-        return (
-            self.enable_deltas_report
-            and compilation_result.success
-            and (
-                any(size.get(self.ReportKeys.absolute) != self.not_applicable_indicator for
-                    size in current_sizes)
-                or (
-                    current_warnings is not None
-                    and current_warnings != self.not_applicable_indicator
-                )
-            )
-        )
-
-    def checkout_deltas_base_ref(self):
-        """git checkout the base ref of the deltas comparison"""
-        repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
-
-        # git fetch the deltas base ref
-        origin_remote = repository.remotes["origin"]
-        origin_remote.fetch(refspec=self.deltas_base_ref,
-                            verbose=self.verbose,
-                            no_tags=True,
-                            prune=True,
-                            depth=1,
-                            recurse_submodules=True)
-
-        # git checkout the deltas base ref
-        repository.git.checkout(self.deltas_base_ref, recurse_submodules=True)
-
-    def get_sizes_report(self, current_sizes, previous_sizes):
-        """Return a list containing all memory usage data assembled.
-
-        Keyword arguments:
-        current_sizes -- memory usage data at the head ref
-        previous_sizes -- memory usage data at the base ref, or None if the size deltas feature is not enabled
-        """
-
-        if previous_sizes is None:
-            # Generate a dummy previous_sizes list full of None
-            previous_sizes = [None for _ in current_sizes]
-
-        sizes_report = []
-        for current_size, previous_size in zip(current_sizes, previous_sizes):
-            sizes_report.append(self.get_size_report(current_size=current_size,
-                                                     previous_size=previous_size))
-
-        return sizes_report
-
-    def get_size_report(self, current_size, previous_size):
-        """Return a list of the combined current and previous size data, with deltas.
-
-        Keyword arguments:
-        current_size -- data from the compilation of the sketch at the pull request's head ref
-        previous_size -- data from the compilation of the sketch at the pull request's base ref, or None if the size
-                         deltas feature is not enabled
-        """
-        size_report = {
-            self.ReportKeys.name: current_size[self.ReportKeys.name],
-            self.ReportKeys.maximum: current_size[self.ReportKeys.maximum],
-            self.ReportKeys.current: {
-                self.ReportKeys.absolute: current_size[self.ReportKeys.absolute],
-                self.ReportKeys.relative: current_size[self.ReportKeys.relative]
-            }
-        }
-
-        if previous_size is not None:
-            # Calculate the memory usage change
-            if (
-                current_size[self.ReportKeys.absolute] == self.not_applicable_indicator
-                or previous_size[self.ReportKeys.absolute] == self.not_applicable_indicator
-            ):
-                absolute_delta = self.not_applicable_indicator
-            else:
-                absolute_delta = (current_size[self.ReportKeys.absolute] - previous_size[self.ReportKeys.absolute])
-
-            if (
-                absolute_delta == self.not_applicable_indicator
-                or size_report[self.ReportKeys.maximum] == self.not_applicable_indicator
-            ):
-                relative_delta = self.not_applicable_indicator
-            else:
-                # Calculate from absolute values to avoid rounding errors
-                relative_delta = round((100 * absolute_delta / size_report[self.ReportKeys.maximum]),
-                                       self.relative_size_report_decimal_places)
-
-            # Size deltas reports are enabled
-            # Print the memory usage change data to the log
-            delta_message = "Change in " + str(current_size[self.ReportKeys.name]) + ": " + str(absolute_delta)
-            if relative_delta != self.not_applicable_indicator:
-                delta_message += " (" + str(relative_delta) + "%)"
-            print(delta_message)
-
-            size_report[self.ReportKeys.previous] = {
-                self.ReportKeys.absolute: previous_size[self.ReportKeys.absolute],
-                self.ReportKeys.relative: previous_size[self.ReportKeys.relative]
-            }
-            size_report[self.ReportKeys.delta] = {
-                self.ReportKeys.absolute: absolute_delta,
-                self.ReportKeys.relative: relative_delta
-            }
-
-        return size_report
-
     def get_warnings_report(self, current_warnings, previous_warnings):
         """Return a dictionary containing the compiler warning counts.
 
@@ -1257,13 +1134,13 @@ class CompileSketches:
             ]
         }
 
-        sizes_summary_report = self.get_sizes_summary_report(sketch_report_list=sketch_report_list)
-        if sizes_summary_report:
-            sketches_report[self.ReportKeys.boards][0][self.ReportKeys.sizes] = sizes_summary_report
+        #sizes_summary_report = self.get_sizes_summary_report(sketch_report_list=sketch_report_list)
+        #if sizes_summary_report:
+        #    sketches_report[self.ReportKeys.boards][0][self.ReportKeys.sizes] = sizes_summary_report
 
-        warnings_summary_report = self.get_warnings_summary_report(sketch_report_list=sketch_report_list)
-        if warnings_summary_report:
-            sketches_report[self.ReportKeys.boards][0][self.ReportKeys.warnings] = warnings_summary_report
+        #warnings_summary_report = self.get_warnings_summary_report(sketch_report_list=sketch_report_list)
+        #if warnings_summary_report:
+        #    sketches_report[self.ReportKeys.boards][0][self.ReportKeys.warnings] = warnings_summary_report
 
         return sketches_report
 
