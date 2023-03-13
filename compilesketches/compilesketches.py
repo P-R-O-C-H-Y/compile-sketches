@@ -966,8 +966,8 @@ class CompileSketches:
         # Add global data for sketch to report
         sketch_report = {
             self.ReportKeys.name: str(path_relative_to_workspace(path=compilation_result.sketch)),
-            self.ReportKeys.compilation_success: self.get_compilation_result(compilation_result.success, 
-                                                                             previous_compilation_result.success),
+            self.ReportKeys.compilation_success: self.get_compilation_result(compilation_result, 
+                                                                             previous_compilation_result),
             self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
                                                          previous_sizes=previous_sizes),
         }
@@ -1242,14 +1242,14 @@ class CompileSketches:
         """
         compilation_report = {
             self.ReportKeys.current: {
-                self.ReportKeys.absolute: current_compilation_result,
+                self.ReportKeys.absolute: current_compilation_result.success,
             }
         }
 
         if previous_compilation_result is not None:
             # Deltas reports are enabled
             compilation_report[self.ReportKeys.previous] = {
-                self.ReportKeys.absolute: previous_compilation_result
+                self.ReportKeys.absolute: previous_compilation_result.success
             }
 
         return compilation_report
