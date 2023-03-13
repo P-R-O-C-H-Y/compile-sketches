@@ -49,7 +49,6 @@ def main():
         cli_compile_flags=os.environ["INPUT_CLI-COMPILE-FLAGS"],
         verbose=os.environ["INPUT_VERBOSE"],
         github_token=os.environ["INPUT_GITHUB-TOKEN"],
-        #enable_deltas_report=os.environ["INPUT_ENABLE-DELTAS-REPORT"],
         enable_warnings_report=os.environ["INPUT_ENABLE-WARNINGS-REPORT"],
         sketches_report_path=os.environ["INPUT_SKETCHES-REPORT-PATH"]
     )
@@ -71,8 +70,6 @@ class CompileSketches:
     cli_compile_flags -- Arbitrary Arduino CLI flags to add to the compile command.
     verbose -- set to "true" for verbose output ("true", "false")
     github_token -- GitHub access token
-    enable_deltas_report -- set to "true" to cause the action to determine the change in memory usage
-                                 ("true", "false")
     enable_warnings_report -- set to "true" to cause the action to add compiler warning count to the sketches report
                                  ("true", "false")
     sketches_report_path -- folder to save the sketches report to
@@ -121,7 +118,7 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path):
+                 github_token, enable_warnings_report, sketches_report_path):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
@@ -135,21 +132,13 @@ class CompileSketches:
         sketch_paths = get_list_from_multiformat_input(input_value=sketch_paths)
         absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in sketch_paths.value]
         self.sketch_paths = absolute_sketch_paths
-
         self.cli_compile_flags = yaml.load(stream=cli_compile_flags, Loader=yaml.SafeLoader)
         self.verbose = parse_boolean_input(boolean_input=verbose)
-
         if github_token == "":
             # Access token is not needed for public repositories
             self.github_api = github.Github()
         else:
             self.github_api = github.Github(login_or_token=github_token)
-
-        self.enable_deltas_report = parse_boolean_input(boolean_input=enable_deltas_report)
-        # The enable-deltas-report input has a default value so it should always be either True or False
-        if self.enable_deltas_report is None:
-            print("::error::Invalid value for enable-deltas-report input")
-            sys.exit(1)
 
         self.enable_warnings_report = parse_boolean_input(boolean_input=enable_warnings_report)
         # The enable-deltas-report input has a default value so it should always be either True or False
@@ -1083,27 +1072,6 @@ class CompileSketches:
             warning_count = self.not_applicable_indicator
 
         return warning_count
-
-    def do_deltas_report(self, compilation_result, current_sizes, current_warnings):
-        """Return whether size deltas reporting is enabled.
-
-        Keyword arguments:
-        compilation_result -- object returned by compile_sketch()
-        current_sizes -- memory usage data from the compilation
-        current_warnings -- compiler warning count
-        """
-        return (
-            self.enable_deltas_report
-            and compilation_result.success
-            and (
-                any(size.get(self.ReportKeys.absolute) != self.not_applicable_indicator for
-                    size in current_sizes)
-                or (
-                    current_warnings is not None
-                    and current_warnings != self.not_applicable_indicator
-                )
-            )
-        )
 
     def get_warnings_report(self, current_warnings, previous_warnings):
         """Return a dictionary containing the compiler warning counts.
