@@ -45,6 +45,18 @@ inputs:
     description: 'Set to true to cause the action to record the compiler warning count for each sketch compilation in the sketches report'
     default: 'false'
     required: true
+  target:
+    description: 'Sets the target to recognise if sketch compilation should be skipped'
+    default: ''
+    required: true
+  use-json-file:
+    description: 'Sets if JSON file will be an imput for libraries and sketches to compile'
+    default: 'false'
+    required: true
+  json-path:
+    description: 'If JSON file is used as input, this sets the path to the JSON file'
+    default: ''
+    required: true
 
 runs:
   using: composite
@@ -72,6 +84,9 @@ runs:
         INPUT_ENABLE-DELTAS-REPORT: ${{ inputs.enable-deltas-report }}
         INPUT_ENABLE-WARNINGS-REPORT: ${{ inputs.enable-warnings-report }}
         INPUT_SKETCHES-REPORT-PATH: ${{ inputs.sketches-report-path }}
+        INPUT_TARGET: ${{ inputs.target }}
+        INPUT_USE-JSON-FILE: ${{ inputs.use-json-file }}
+        INPUT_JSON-PATH: ${{ inputs.json-path }}
       run: |
         source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
         "${{ steps.setup.outputs.python-command }}" "${{ github.action_path }}/compilesketches/compilesketches.py"
