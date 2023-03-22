@@ -201,12 +201,17 @@ class CompileSketches:
         return repository_api.get_pull(number=pull_request_number).base.ref
 
     def compile_sketches(self):
+
+        print("::group::Installing ...")
+
         """Do compilation tests and record data."""
         self.install_arduino_cli()
 
         # Install the platform dependency
         # TODO: ESP32 Arduino core insttalation from repo --> run get.py command
         self.install_platforms()
+
+        print("::endgroup::")
 
         # TODO: Go trough JSON file and install library if not excluded target and compile sketch
         #       + add library name to the results artifact
