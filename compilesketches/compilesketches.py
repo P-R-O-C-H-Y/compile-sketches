@@ -792,7 +792,7 @@ class CompileSketches:
         # automatically installed. For this reason, LM-sources must be installed first so the library dependencies from
         # other sources which were explicitly defined won't be replaced.
 
-        print(vars(library))
+        print(library)
         print("\n")
 
         print(vars(library_list))
