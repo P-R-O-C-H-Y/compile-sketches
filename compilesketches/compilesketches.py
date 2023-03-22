@@ -212,7 +212,7 @@ class CompileSketches:
         #       + add library name to the results artifact
         # TODO: Run multiple sketches defined by path or just a folder.
         if self.use_json_file == True:
-        
+            sketch_report_list = []
         else:
             # Install the library dependencies
             self.install_libraries()
