@@ -795,7 +795,7 @@ class CompileSketches:
         print(library)
         print("\n")
 
-        print(library_list)
+        print(vars(library_list))
         print("\n")
 
         if len(library_list.manager) > 0:
