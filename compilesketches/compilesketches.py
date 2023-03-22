@@ -51,7 +51,10 @@ def main():
         github_token=os.environ["INPUT_GITHUB-TOKEN"],
         enable_deltas_report=os.environ["INPUT_ENABLE-DELTAS-REPORT"],
         enable_warnings_report=os.environ["INPUT_ENABLE-WARNINGS-REPORT"],
-        sketches_report_path=os.environ["INPUT_SKETCHES-REPORT-PATH"]
+        sketches_report_path=os.environ["INPUT_SKETCHES-REPORT-PATH"],
+        target=os.environ["INPUT_TARGET"],
+        use_json_file=os.environ["INPUT_USE-JSON-FILE"],
+        json_path=os.environ["INPUT_JSON-PATH"]
     )
 
     compile_sketches.compile_sketches()
@@ -121,7 +124,7 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path):
+                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, use_json_file, json_path):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
@@ -129,12 +132,18 @@ class CompileSketches:
         self.fqbn = parsed_fqbn_arg["fqbn"]
         self.additional_url = parsed_fqbn_arg["additional_url"]
         self.platforms = platforms
-        self.libraries = libraries
 
-        # Save the space-separated list of paths as a Python list
-        sketch_paths = get_list_from_multiformat_input(input_value=sketch_paths)
-        absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in sketch_paths.value]
-        self.sketch_paths = absolute_sketch_paths
+        self.target = target
+
+        self.use_json_file = parse_boolean_input(boolean_input=use_json_file)
+        if use_json_file == True:
+            self.json_path = json_path
+        else:
+            self.libraries = libraries
+            # Save the space-separated list of paths as a Python list
+            sketch_paths = get_list_from_multiformat_input(input_value=sketch_paths)
+            absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in sketch_paths.value]
+            self.sketch_paths = absolute_sketch_paths
 
         self.cli_compile_flags = yaml.load(stream=cli_compile_flags, Loader=yaml.SafeLoader)
         self.verbose = parse_boolean_input(boolean_input=verbose)
@@ -196,34 +205,41 @@ class CompileSketches:
         self.install_arduino_cli()
 
         # Install the platform dependency
+        # TODO: ESP32 Arduino core insttalation from repo --> run get.py command
         self.install_platforms()
 
-        # Install the library dependencies
-        self.install_libraries()
-
-        # Compile all sketches under the paths specified by the sketch-paths input
+        # TODO: Go trough JSON file and install library if not excluded target and compile sketch
+        #       + add library name to the results artifact
+        # TODO: Run multiple sketches defined by path or just a folder.
+        if self.use_json_file == True:
         
-        #all_compilations_successful = True
-        sketch_report_list = []
+        else:
+            # Install the library dependencies
+            self.install_libraries()
 
-        sketch_list = self.find_sketches()
-        for sketch in sketch_list:
-            # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
-            # only the first sketch compilation's warning count would reflect warnings from cached code
-            compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
-            #if not compilation_result.success:
-            #    all_compilations_successful = False
+            # Compile all sketches under the paths specified by the sketch-paths input
+            
+            #all_compilations_successful = True
+            sketch_report_list = []
 
-            # Store the size data for this sketch
-            sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+            sketch_list = self.find_sketches()
+            for sketch in sketch_list:
+                # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
+                # only the first sketch compilation's warning count would reflect warnings from cached code
+                compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+                #if not compilation_result.success:
+                #    all_compilations_successful = False
 
-        sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
+                # Store the size data for this sketch
+                sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
 
-        self.create_sketches_report_file(sketches_report=sketches_report)
+            sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
-       # if not all_compilations_successful:
-       #     print("::error::One or more compilations failed")
-       #     sys.exit(1)
+            self.create_sketches_report_file(sketches_report=sketches_report)
+
+            # if not all_compilations_successful:
+            #     print("::error::One or more compilations failed")
+            #     sys.exit(1)
 
     def install_arduino_cli(self):
         """Install Arduino CLI."""
@@ -311,12 +327,25 @@ class CompileSketches:
 
         if len(platform_list.path) > 0:
             self.install_platforms_from_path(platform_list=platform_list.path)
+            self.run_get_command
 
         if len(platform_list.repository) > 0:
             self.install_platforms_from_repository(platform_list=platform_list.repository)
+            self.run_get_command
 
         if len(platform_list.download) > 0:
             self.install_platforms_from_download(platform_list=platform_list.download)
+            self.run_get_command
+
+    def run_get_command(self):
+        """Get tools"""
+        runner_os = os.environ["RUNNER_OS"]
+        if runner_os == "Linux":
+            os.startfile(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"))
+        if runner_os == "Windows":
+            os.startfile(self.user_platforms_path.joinpath("espressif/esp32/tools/get.exe"))
+        if runner_os == "macOS":
+            os.startfile(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"))
 
     def get_fqbn_platform_dependency(self):
         """Return the platform dependency definition automatically generated from the FQBN."""
