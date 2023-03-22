@@ -136,7 +136,7 @@ class CompileSketches:
         self.target = target
 
         self.use_json_file = parse_boolean_input(boolean_input=use_json_file)
-        if use_json_file == True:
+        if self.use_json_file == True:
             self.json_path = json_path
         else:
             self.libraries = libraries
