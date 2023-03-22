@@ -353,7 +353,8 @@ class CompileSketches:
         path = self.user_platforms_path.joinpath("espressif/esp32/tools/")
         os.chdir(path)
         if runner_os == "Linux":
-            os.system("get.py")
+            subprocess.call("get.py", shell=False)
+            # os.system("get.py")
             print("get.py started")
         if runner_os == "Windows":
             os.system("get.exe")
