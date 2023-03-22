@@ -333,17 +333,17 @@ class CompileSketches:
 
         if len(platform_list.path) > 0:
             self.install_platforms_from_path(platform_list=platform_list.path)
-            self.run_get_command
+            self.run_get_command()
             print("Installing platform from path")
 
         if len(platform_list.repository) > 0:
             self.install_platforms_from_repository(platform_list=platform_list.repository)
-            self.run_get_command
+            self.run_get_command()
             print("Installing platform from repository")
 
         if len(platform_list.download) > 0:
             self.install_platforms_from_download(platform_list=platform_list.download)
-            self.run_get_command
+            self.run_get_command()
             print("Installing platform from download")
 
     def run_get_command(self):
