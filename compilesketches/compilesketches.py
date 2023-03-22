@@ -350,18 +350,19 @@ class CompileSketches:
         """Get tools"""
         runner_os = os.environ["RUNNER_OS"]
         print("Runner os: ", runner_os)
-        path = self.user_platforms_path.joinpath("espressif/esp32/tools/")
-        os.chdir(path)
         if runner_os == "Linux":
             subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), shell=False)
             # os.system("get.py")
             print("get.py started")
-        if runner_os == "Windows":
-            os.system("get.exe")
+        elif runner_os == "Windows":
+            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.exe"), shell=False)
             print("get.exe started")
-        if runner_os == "macOS":
-            os.system("get.py")
+        elif runner_os == "macOS":
+            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), shell=False)
             print ("get.py started")
+        else:
+            print ("::error:: Unrecognised OS, aborting..")
+            sys.exit(1)
 
     def get_fqbn_platform_dependency(self):
         """Return the platform dependency definition automatically generated from the FQBN."""
