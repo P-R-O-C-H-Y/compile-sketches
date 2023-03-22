@@ -340,12 +340,16 @@ class CompileSketches:
     def run_get_command(self):
         """Get tools"""
         runner_os = os.environ["RUNNER_OS"]
+        print("::info::Runner os: ", runner_os)
         if runner_os == "Linux":
             os.startfile(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"))
+            print("::info:: get.py started")
         if runner_os == "Windows":
             os.startfile(self.user_platforms_path.joinpath("espressif/esp32/tools/get.exe"))
+            print("::info:: get.exe started")
         if runner_os == "macOS":
             os.startfile(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"))
+            print("::info:: get.py started")
 
     def get_fqbn_platform_dependency(self):
         """Return the platform dependency definition automatically generated from the FQBN."""
