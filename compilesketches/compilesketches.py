@@ -208,16 +208,41 @@ class CompileSketches:
         self.install_arduino_cli()
 
         # Install the platform dependency
-        # TODO: ESP32 Arduino core insttalation from repo --> run get.py command
         self.install_platforms()
 
         print("::endgroup::")
 
+        print("::group::Compiling ...")
         # TODO: Go trough JSON file and install library if not excluded target and compile sketch
         #       + add library name to the results artifact
         # TODO: Run multiple sketches defined by path or just a folder.
         if self.use_json_file == True:
+            #all_compilations_successful = True
             sketch_report_list = []
+            #libraries_list = []
+
+            with open(self.json_path) as f:
+                libraries_list = json.load(f)
+
+            for library in libraries_list:
+                #install library
+                self.install_library(library)
+                #compile sketch if not target is not in excluded array
+                #append sketch report list with Library name and compilation result
+
+
+                # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
+                # only the first sketch compilation's warning count would reflect warnings from cached code
+                compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+                #if not compilation_result.success:
+                #    all_compilations_successful = False
+
+                # Store the size data for this sketch
+                sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+
+            sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
+
+            self.create_sketches_report_file(sketches_report=sketches_report)
         else:
             # Install the library dependencies
             self.install_libraries()
@@ -245,6 +270,7 @@ class CompileSketches:
             # if not all_compilations_successful:
             #     print("::error::One or more compilations failed")
             #     sys.exit(1)
+        print("::endgroup::")
 
     def install_arduino_cli(self):
         """Install Arduino CLI."""
@@ -328,23 +354,23 @@ class CompileSketches:
         if len(platform_list.manager) > 0:
             # This should always be called before the functions to install platforms from other sources so that the
             # override system will work
-            self.install_platforms_from_board_manager(platform_list=platform_list.manager)
             print("Installing platform from board manager")
+            self.install_platforms_from_board_manager(platform_list=platform_list.manager)
 
         if len(platform_list.path) > 0:
+            print("Installing platform from path")
             self.install_platforms_from_path(platform_list=platform_list.path)
             self.run_get_command()
-            print("Installing platform from path")
 
         if len(platform_list.repository) > 0:
+            print("Installing platform from repository")
             self.install_platforms_from_repository(platform_list=platform_list.repository)
             self.run_get_command()
-            print("Installing platform from repository")
 
         if len(platform_list.download) > 0:
+            print("Installing platform from download")
             self.install_platforms_from_download(platform_list=platform_list.download)
             self.run_get_command()
-            print("Installing platform from download")
 
     def run_get_command(self):
         """Get tools"""
@@ -352,16 +378,12 @@ class CompileSketches:
         print("Runner os: ", runner_os)
         if runner_os == "Linux":
             subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), shell=False)
-            # os.system("get.py")
-            print("get.py started")
         elif runner_os == "Windows":
             subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.exe"), shell=False)
-            print("get.exe started")
         elif runner_os == "macOS":
             subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), shell=False)
-            print ("get.py started")
         else:
-            print ("::error:: Unrecognised OS, aborting..")
+            print ("::error:: Unsupported OS, aborting..")
             sys.exit(1)
 
     def get_fqbn_platform_dependency(self):
@@ -747,6 +769,46 @@ class CompileSketches:
                                        destination_parent_path=destination_path.path.parent,
                                        destination_name=destination_path.path.name,
                                        force=destination_path.is_overwrite)
+
+    def install_library(self, library):
+        """Install Arduino library."""
+        #libraries = library
+
+        library_list = self.Dependencies()
+
+        #if libraries.was_yaml_list:
+            # libraries input is YAML
+        library_list = self.sort_dependency_list(library)
+        #else:
+            # libraries input uses the old space-separated list syntax
+        #library_list.manager = [{self.dependency_name_key: library_name}
+        #                           for library_name in library]
+
+            # The original behavior of the action was to assume the root of the repo is a library to be installed, so
+            # that behavior is retained when using the old input syntax
+        #library_list.path = [{self.dependency_source_path_key: os.environ["GITHUB_WORKSPACE"]}]
+
+        # Dependencies of Library Manager sourced libraries (as defined by the library's metadata file) are
+        # automatically installed. For this reason, LM-sources must be installed first so the library dependencies from
+        # other sources which were explicitly defined won't be replaced.
+
+        print(library)
+        print("\n")
+
+        print(library_list)
+        print("\n")
+
+        if len(library_list.manager) > 0:
+            self.install_libraries_from_library_manager(library_list=library_list.manager)
+
+        if len(library_list.path) > 0:
+            self.install_libraries_from_path(library_list=library_list.path)
+
+        if len(library_list.repository) > 0:
+            self.install_libraries_from_repository(library_list=library_list.repository)
+
+        if len(library_list.download) > 0:
+            self.install_libraries_from_download(library_list=library_list.download)
 
     def install_libraries(self):
         """Install Arduino libraries."""
