@@ -329,18 +329,22 @@ class CompileSketches:
             # This should always be called before the functions to install platforms from other sources so that the
             # override system will work
             self.install_platforms_from_board_manager(platform_list=platform_list.manager)
+            print("Installing platform from board manager")
 
         if len(platform_list.path) > 0:
             self.install_platforms_from_path(platform_list=platform_list.path)
             self.run_get_command
+            print("Installing platform from path")
 
         if len(platform_list.repository) > 0:
             self.install_platforms_from_repository(platform_list=platform_list.repository)
             self.run_get_command
+            print("Installing platform from repository")
 
         if len(platform_list.download) > 0:
             self.install_platforms_from_download(platform_list=platform_list.download)
             self.run_get_command
+            print("Installing platform from download")
 
     def run_get_command(self):
         """Get tools"""
