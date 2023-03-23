@@ -223,6 +223,10 @@ class CompileSketches:
 
             with open(self.json_path) as f:
                 libraries_list = json.load(f)
+            
+            yaml_string=yaml.dump(libraries_list)
+            print("The YAML file is:")
+            print(yaml_string)
 
             for library in libraries_list:
                 #install library
@@ -778,6 +782,10 @@ class CompileSketches:
         library_python_list2 = []
         #if libraries.was_yaml_list:
             # libraries input is YAML
+        yaml_string=yaml.dump(library)
+        print("The YAML file is:")
+        print(yaml_string)
+
         library_python_list = library.items()
         library_list_old = self.sort_dependency_list(library)
         library_list = self.sort_dependency_list(library_python_list)
@@ -787,6 +795,7 @@ class CompileSketches:
             library_python_list2.append(temp)
 
         library_list2 = self.sort_dependency_list(library_python_list2)
+        library_list3 = self.sort_dependency_list(yaml_string)
         #else:
             # libraries input uses the old space-separated list syntax
         #library_list.manager = [{self.dependency_name_key: library_name}
@@ -810,6 +819,9 @@ class CompileSketches:
         print("\n")
 
         print(vars(library_list2))
+        print("\n")
+
+        print(vars(library_list3))
         print("\n")
 
         if len(library_list.manager) > 0:
