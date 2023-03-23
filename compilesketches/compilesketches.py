@@ -775,12 +775,18 @@ class CompileSketches:
         #libraries = library
 
         library_list = self.Dependencies()
-
+        library_python_list2 = []
         #if libraries.was_yaml_list:
             # libraries input is YAML
         library_python_list = library.items()
         library_list_old = self.sort_dependency_list(library)
         library_list = self.sort_dependency_list(library_python_list)
+
+        for key, value in library.iteritems():
+            temp = [key,value]
+            library_python_list2.append(temp)
+
+        library_list2 = self.sort_dependency_list(library_python_list2)
         #else:
             # libraries input uses the old space-separated list syntax
         #library_list.manager = [{self.dependency_name_key: library_name}
@@ -801,6 +807,9 @@ class CompileSketches:
         print("\n")
 
         print(vars(library_list))
+        print("\n")
+
+        print(vars(library_list2))
         print("\n")
 
         if len(library_list.manager) > 0:
