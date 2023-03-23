@@ -782,7 +782,7 @@ class CompileSketches:
         library_list_old = self.sort_dependency_list(library)
         library_list = self.sort_dependency_list(library_python_list)
 
-        for key, value in library.iteritems():
+        for key, value in library.items():
             temp = [key,value]
             library_python_list2.append(temp)
 
