@@ -786,6 +786,10 @@ class CompileSketches:
         print("The YAML file is:")
         print(yaml_string)
         library_from_yaml = get_list_from_multiformat_input(input_value=yaml_string)
+
+        print(library_from_yaml)
+        print("\n")
+
         library_python_list = library.items()
         library_list_old = self.sort_dependency_list(library)
         library_list = self.sort_dependency_list(library_python_list)
