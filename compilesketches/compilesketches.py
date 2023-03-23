@@ -778,7 +778,9 @@ class CompileSketches:
 
         #if libraries.was_yaml_list:
             # libraries input is YAML
-        library_list = self.sort_dependency_list(library)
+        library_python_list = library.items()
+        library_list_old = self.sort_dependency_list(library)
+        library_list = self.sort_dependency_list(library_python_list)
         #else:
             # libraries input uses the old space-separated list syntax
         #library_list.manager = [{self.dependency_name_key: library_name}
@@ -793,6 +795,9 @@ class CompileSketches:
         # other sources which were explicitly defined won't be replaced.
 
         print(library)
+        print("\n")
+
+        print(vars(library_list_old))
         print("\n")
 
         print(vars(library_list))
