@@ -785,7 +785,7 @@ class CompileSketches:
         yaml_string=yaml.dump(library)
         print("The YAML file is:")
         print(yaml_string)
-
+        library_from_yaml = get_list_from_multiformat_input(input_value=yaml_string)
         library_python_list = library.items()
         library_list_old = self.sort_dependency_list(library)
         library_list = self.sort_dependency_list(library_python_list)
@@ -795,7 +795,7 @@ class CompileSketches:
             library_python_list2.append(temp)
 
         library_list2 = self.sort_dependency_list(library_python_list2)
-        library_list3 = self.sort_dependency_list(yaml_string)
+        library_list3 = self.sort_dependency_list(library_from_yaml)
         #else:
             # libraries input uses the old space-separated list syntax
         #library_list.manager = [{self.dependency_name_key: library_name}
