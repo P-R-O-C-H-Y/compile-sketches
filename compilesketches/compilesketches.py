@@ -787,7 +787,7 @@ class CompileSketches:
         print(yaml_string)
         library_from_yaml = get_list_from_multiformat_input(input_value=yaml_string)
 
-        print(library_from_yaml)
+        print(library_from_yaml.value)
         print("\n")
 
         library_python_list = library.items()
@@ -799,7 +799,7 @@ class CompileSketches:
             library_python_list2.append(temp)
 
         library_list2 = self.sort_dependency_list(library_python_list2)
-        library_list3 = self.sort_dependency_list(library_from_yaml)
+        library_list3 = self.sort_dependency_list(library_from_yaml.value)
         #else:
             # libraries input uses the old space-separated list syntax
         #library_list.manager = [{self.dependency_name_key: library_name}
