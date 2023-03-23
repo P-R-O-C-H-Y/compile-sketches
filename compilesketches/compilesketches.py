@@ -813,7 +813,11 @@ class CompileSketches:
     def install_libraries(self):
         """Install Arduino libraries."""
         libraries = get_list_from_multiformat_input(input_value=self.libraries)
-
+        print("\n")
+        print(vars(libraries))
+        print("\n")
+        print(libraries)
+        print("\n")
         library_list = self.Dependencies()
         if libraries.was_yaml_list:
             # libraries input is YAML
