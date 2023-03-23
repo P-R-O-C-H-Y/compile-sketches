@@ -827,6 +827,9 @@ class CompileSketches:
             # that behavior is retained when using the old input syntax
             library_list.path = [{self.dependency_source_path_key: os.environ["GITHUB_WORKSPACE"]}]
 
+        print(vars(library_list))
+        print("\n")
+
         # Dependencies of Library Manager sourced libraries (as defined by the library's metadata file) are
         # automatically installed. For this reason, LM-sources must be installed first so the library dependencies from
         # other sources which were explicitly defined won't be replaced.
