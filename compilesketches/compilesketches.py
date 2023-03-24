@@ -780,13 +780,13 @@ class CompileSketches:
         library_python_list2 = []
         #if libraries.was_yaml_list:
             # libraries input is YAML
-        yaml_string=yaml.dump(library)
-        print("The YAML file is:")
-        print(yaml_string)
-        library_from_yaml = get_list_from_multiformat_input(input_value=yaml_string)
+        #yaml_string=yaml.dump(library)
+        #print("The YAML file is:")
+        #print(yaml_string)
+        #library_from_yaml = get_list_from_multiformat_input(input_value=yaml_string)
 
-        print(library_from_yaml.value)
-        print("\n")
+        #print(library_from_yaml.value)
+        #print("\n")
 
         library_python_list = library.items()
         library_list_old = self.sort_dependency_list(library)
@@ -797,7 +797,7 @@ class CompileSketches:
             library_python_list2.append(temp)
 
         library_list2 = self.sort_dependency_list(library_python_list2)
-        library_list3 = self.sort_dependency_list(library_from_yaml.value)
+        #library_list3 = self.sort_dependency_list(library_from_yaml.value)
         #else:
             # libraries input uses the old space-separated list syntax
         #library_list.manager = [{self.dependency_name_key: library_name}
@@ -823,8 +823,8 @@ class CompileSketches:
         print(vars(library_list2))
         print("\n")
 
-        print(vars(library_list3))
-        print("\n")
+        #print(vars(library_list3))
+        #print("\n")
 
         if len(library_list.manager) > 0:
             self.install_libraries_from_library_manager(library_list=library_list.manager)
