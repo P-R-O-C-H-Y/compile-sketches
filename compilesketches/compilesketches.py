@@ -229,7 +229,8 @@ class CompileSketches:
                 self.install_library(library)
                 #compile sketch if not target is not in excluded array
                 #append sketch report list with Library name and compilation result
-                self.sketch_paths = library['sketch_path']
+
+                self.sketch_paths = [absolute_path(path=library['sketch_path'])]
                 print(self.sketch_paths)
                 sketch_list = self.find_sketches()
                 print(sketch_list)
