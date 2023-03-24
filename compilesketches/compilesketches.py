@@ -223,8 +223,6 @@ class CompileSketches:
 
             with open(self.json_path) as f:
                 libraries_list = json.load(f)
-            
-            print(libraries_list)
 
             for library in libraries_list:
                 #install library
@@ -232,7 +230,9 @@ class CompileSketches:
                 #compile sketch if not target is not in excluded array
                 #append sketch report list with Library name and compilation result
                 self.sketch_paths = library['sketch_path']
+                print(self.sketch_paths)
                 sketch_list = self.find_sketches()
+                print(sketch_list)
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 compilation_result = self.compile_sketch(sketch_path=sketch_list[0], clean_build_cache=self.enable_warnings_report)
@@ -253,8 +253,9 @@ class CompileSketches:
             
             #all_compilations_successful = True
             sketch_report_list = []
-
+            print(self.sketch_paths)
             sketch_list = self.find_sketches()
+            print(sketch_list)
             for sketch in sketch_list:
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
