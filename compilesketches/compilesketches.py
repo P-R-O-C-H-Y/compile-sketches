@@ -405,7 +405,7 @@ class CompileSketches:
         dependency_list -- a list of dictionaries defining dependencies
         """
         print(dependency_list)
-        
+
         sorted_dependencies = self.Dependencies()
         for dependency in dependency_list:
             if dependency is not None:
@@ -791,16 +791,16 @@ class CompileSketches:
 
         #print(library_from_yaml.value)
         #print("\n")
-        library_python_list = library.items()
-        library_list_old = self.sort_dependency_list(library)
-        library_list = self.sort_dependency_list(library_python_list)
+        #library_python_list = library.items()
+        library_list_old = self.sort_dependency_list([library])
+        #library_list = self.sort_dependency_list(library_python_list)
 
 
-        for key, value in library.items():
-            temp = [key,value]
-            library_python_list2.append(temp)
+        #for key, value in library.items():
+        #    temp = [key,value]
+        #    library_python_list2.append(temp)
 
-        library_list2 = self.sort_dependency_list(library_python_list2)
+        #library_list2 = self.sort_dependency_list(library_python_list2)
         #library_list3 = self.sort_dependency_list(library_from_yaml.value)
         #else:
             # libraries input uses the old space-separated list syntax
@@ -821,23 +821,23 @@ class CompileSketches:
         print(vars(library_list_old))
         print("\n")
 
-        print(vars(library_list))
-        print("\n")
+        #print(vars(library_list))
+        #print("\n")
 
-        print(vars(library_list2))
-        print("\n")
+        #print(vars(library_list2))
+        #print("\n")
 
 
-        if len(library_list2.manager) > 0:
-            self.install_libraries_from_library_manager(library_list=library_list2.manager)
+        if len(library_list_old.manager) > 0:
+            self.install_libraries_from_library_manager(library_list=library_list_old.manager)
 
-        if len(library_list.path) > 0:
+        if len(library_list_old.path) > 0:
             self.install_libraries_from_path(library_list=library_list.path)
 
-        if len(library_list.repository) > 0:
+        if len(library_list_old.repository) > 0:
             self.install_libraries_from_repository(library_list=library_list.repository)
 
-        if len(library_list.download) > 0:
+        if len(library_list_old.download) > 0:
             self.install_libraries_from_download(library_list=library_list.download)
 
     def install_libraries(self):
