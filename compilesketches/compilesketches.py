@@ -236,12 +236,13 @@ class CompileSketches:
                 print(sketch_list)
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
-                compilation_result = self.compile_sketch(sketch_path=sketch_list[0], clean_build_cache=self.enable_warnings_report)
-                #if not compilation_result.success:
-                #    all_compilations_successful = False
+                if self.target not in library['exclude_target']:
+                    compilation_result = self.compile_sketch(sketch_path=sketch_list[0], clean_build_cache=self.enable_warnings_report)
+                    #if not compilation_result.success:
+                    #    all_compilations_successful = False
 
-                # Store the size data for this sketch
-                sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+                    # Store the size data for this sketch
+                    sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
 
             sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
