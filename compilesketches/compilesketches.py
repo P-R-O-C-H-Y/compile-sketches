@@ -404,8 +404,6 @@ class CompileSketches:
         Keyword arguments:
         dependency_list -- a list of dictionaries defining dependencies
         """
-        print(dependency_list)
-
         sorted_dependencies = self.Dependencies()
         for dependency in dependency_list:
             if dependency is not None:
@@ -794,11 +792,6 @@ class CompileSketches:
     def install_libraries(self):
         """Install Arduino libraries."""
         libraries = get_list_from_multiformat_input(input_value=self.libraries)
-        print("\n")
-        print(vars(libraries))
-        print("\n")
-        print(libraries)
-        print("\n")
         library_list = self.Dependencies()
         if libraries.was_yaml_list:
             # libraries input is YAML
@@ -811,9 +804,6 @@ class CompileSketches:
             # The original behavior of the action was to assume the root of the repo is a library to be installed, so
             # that behavior is retained when using the old input syntax
             library_list.path = [{self.dependency_source_path_key: os.environ["GITHUB_WORKSPACE"]}]
-
-        print(vars(library_list))
-        print("\n")
 
         # Dependencies of Library Manager sourced libraries (as defined by the library's metadata file) are
         # automatically installed. For this reason, LM-sources must be installed first so the library dependencies from
@@ -836,8 +826,6 @@ class CompileSketches:
         Keyword arguments:
         library_list -- list of dictionaries defining the dependencies
         """
-        print(library_list)
-
         lib_install_base_command = ["lib", "install"]
         # `arduino-cli lib install` fails if one of the libraries in the list has a dependency on another, but an
         # earlier version of the dependency is specified in the list. The solution is to install one library at a time
