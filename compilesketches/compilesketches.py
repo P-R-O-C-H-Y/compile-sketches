@@ -224,11 +224,9 @@ class CompileSketches:
             with open(self.json_path) as f:
                 libraries_list = json.load(f)
             
-            yaml_string=yaml.dump(libraries_list)
-            print("The YAML file is:")
-            print(yaml_string)
+            print(libraries_list)
 
-            for library in libraries_list:
+            for library in libraries_list['Libraries']:
                 #install library
                 self.install_library(library)
                 #compile sketch if not target is not in excluded array
