@@ -114,6 +114,7 @@ class CompileSketches:
         minimum = "minimum"
         maximum = "maximum"
         sketches = "sketches"
+        library = "library"
 
     dependency_name_key = "name"
     dependency_version_key = "version"
@@ -213,8 +214,8 @@ class CompileSketches:
         print("::endgroup::")
 
         print("::group::Compiling ...")
-        # TODO: Go trough JSON file and install library if not excluded target and compile sketch
-        #       + add library name to the results artifact
+        # DONE: Go trough JSON file and install library if not excluded target and compile sketch
+        # TODO: add library name to the results artifact
         # TODO: Run multiple sketches defined by path or just a folder.
         if self.use_json_file == True:
             #all_compilations_successful = True
@@ -242,7 +243,10 @@ class CompileSketches:
                     #    all_compilations_successful = False
 
                     # Store the size data for this sketch
-                    sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+                    sketch_report = self.get_sketch_report(compilation_result=compilation_result)
+                    sketch_report[self.ReportKeys.library] = library['name']
+                    sketch_report_list.append(sketch_report)
+                    #sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
 
             sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
