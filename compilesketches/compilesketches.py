@@ -231,11 +231,11 @@ class CompileSketches:
                 self.install_library(library)
                 #compile sketch if not target is not in excluded array
                 #append sketch report list with Library name and compilation result
-
-
+                self.sketch_paths = library['sketch_path']
+                sketch_list = self.find_sketches()
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
-                compilation_result = self.compile_sketch(sketch_path=library['sketch_path'], clean_build_cache=self.enable_warnings_report)
+                compilation_result = self.compile_sketch(sketch_path=sketch_list[0], clean_build_cache=self.enable_warnings_report)
                 #if not compilation_result.success:
                 #    all_compilations_successful = False
 
@@ -977,6 +977,7 @@ class CompileSketches:
         if self.cli_compile_flags is not None:
             compilation_command.extend(self.cli_compile_flags)
         compilation_command.append(sketch_path)
+        print(sketch_path)
 
         if clean_build_cache:
             for cache_path in pathlib.Path("/tmp").glob(pattern="arduino*"):
