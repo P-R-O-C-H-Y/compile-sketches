@@ -226,7 +226,7 @@ class CompileSketches:
             
             print(libraries_list)
 
-            for library in libraries_list['Libraries']:
+            for library in libraries_list:
                 #install library
                 self.install_library(library)
                 #compile sketch if not target is not in excluded array
