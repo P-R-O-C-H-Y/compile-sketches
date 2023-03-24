@@ -404,6 +404,8 @@ class CompileSketches:
         Keyword arguments:
         dependency_list -- a list of dictionaries defining dependencies
         """
+        print(dependency_list)
+        
         sorted_dependencies = self.Dependencies()
         for dependency in dependency_list:
             if dependency is not None:
@@ -884,7 +886,6 @@ class CompileSketches:
         library_list -- list of dictionaries defining the dependencies
         """
         print(library_list)
-        print(vars(library_list))
 
         lib_install_base_command = ["lib", "install"]
         # `arduino-cli lib install` fails if one of the libraries in the list has a dependency on another, but an
