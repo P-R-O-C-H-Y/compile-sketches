@@ -779,7 +779,7 @@ class CompileSketches:
         library_list = self.Dependencies()
         library_list_old = self.Dependencies()
         library_list2 = self.Dependencies()
-        library_python_list2 = []
+        library_python_list2 = self.Dependencies()
         #if libraries.was_yaml_list:
             # libraries input is YAML
         #yaml_string=yaml.dump(library)
