@@ -381,11 +381,11 @@ class CompileSketches:
         runner_os = os.environ["RUNNER_OS"]
         print("Runner os: ", runner_os)
         if runner_os == "Linux":
-            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), shell=False)
+            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), cwd=self.user_platforms_path.joinpath("espressif/esp32/tools"), shell=False)
         elif runner_os == "Windows":
-            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.exe"), shell=False)
+            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.exe"), cwd=self.user_platforms_path.joinpath("espressif/esp32/tools"), shell=False)
         elif runner_os == "macOS":
-            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), shell=False)
+            subprocess.call(self.user_platforms_path.joinpath("espressif/esp32/tools/get.py"), cwd=self.user_platforms_path.joinpath("espressif/esp32/tools"), shell=False)
         else:
             print ("::error:: Unsupported OS, aborting..")
             sys.exit(1)
