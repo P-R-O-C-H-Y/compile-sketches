@@ -779,7 +779,6 @@ class CompileSketches:
         library_list = self.Dependencies()
         library_list_old = self.Dependencies()
         library_list2 = self.Dependencies()
-        library_list3 = self.Dependencies()
         library_python_list2 = []
         #if libraries.was_yaml_list:
             # libraries input is YAML
@@ -790,11 +789,10 @@ class CompileSketches:
 
         #print(library_from_yaml.value)
         #print("\n")
-        result_dict = {"value": library}
         library_python_list = library.items()
         library_list_old = self.sort_dependency_list(library)
         library_list = self.sort_dependency_list(library_python_list)
-        library_list3 = self.sort_dependency_list(result_dict.value)
+
 
         for key, value in library.items():
             temp = [key,value]
@@ -827,8 +825,6 @@ class CompileSketches:
         print(vars(library_list2))
         print("\n")
 
-        print(vars(library_list3))
-        print("\n")
 
         if len(library_list.manager) > 0:
             self.install_libraries_from_library_manager(library_list=library_list.manager)
