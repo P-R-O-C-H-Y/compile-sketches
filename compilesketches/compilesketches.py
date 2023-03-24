@@ -235,7 +235,7 @@ class CompileSketches:
 
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
-                compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+                compilation_result = self.compile_sketch(sketch_path=library['sketch_path'], clean_build_cache=self.enable_warnings_report)
                 #if not compilation_result.success:
                 #    all_compilations_successful = False
 
@@ -776,68 +776,19 @@ class CompileSketches:
 
     def install_library(self, library):
         """Install Arduino library."""
-        #libraries = library
-
         library_list = self.Dependencies()
-        library_list_old = self.Dependencies()
-        library_list2 = self.Dependencies()
-        library_python_list2 = []
-        #if libraries.was_yaml_list:
-            # libraries input is YAML
-        #yaml_string=yaml.dump(library)
-        #print("The YAML file is:")
-        #print(yaml_string)
-        #library_from_yaml = get_list_from_multiformat_input(input_value=yaml_string)
+        library_list = self.sort_dependency_list([library])
 
-        #print(library_from_yaml.value)
-        #print("\n")
-        #library_python_list = library.items()
-        library_list_old = self.sort_dependency_list([library])
-        #library_list = self.sort_dependency_list(library_python_list)
+        if len(library_list.manager) > 0:
+            self.install_libraries_from_library_manager(library_list=library_list.manager)
 
-
-        #for key, value in library.items():
-        #    temp = [key,value]
-        #    library_python_list2.append(temp)
-
-        #library_list2 = self.sort_dependency_list(library_python_list2)
-        #library_list3 = self.sort_dependency_list(library_from_yaml.value)
-        #else:
-            # libraries input uses the old space-separated list syntax
-        #library_list.manager = [{self.dependency_name_key: library_name}
-        #                           for library_name in library]
-
-            # The original behavior of the action was to assume the root of the repo is a library to be installed, so
-            # that behavior is retained when using the old input syntax
-        #library_list.path = [{self.dependency_source_path_key: os.environ["GITHUB_WORKSPACE"]}]
-
-        # Dependencies of Library Manager sourced libraries (as defined by the library's metadata file) are
-        # automatically installed. For this reason, LM-sources must be installed first so the library dependencies from
-        # other sources which were explicitly defined won't be replaced.
-
-        print(library)
-        print("\n")
-
-        print(vars(library_list_old))
-        print("\n")
-
-        #print(vars(library_list))
-        #print("\n")
-
-        #print(vars(library_list2))
-        #print("\n")
-
-
-        if len(library_list_old.manager) > 0:
-            self.install_libraries_from_library_manager(library_list=library_list_old.manager)
-
-        if len(library_list_old.path) > 0:
+        if len(library_list.path) > 0:
             self.install_libraries_from_path(library_list=library_list.path)
 
-        if len(library_list_old.repository) > 0:
+        if len(library_list.repository) > 0:
             self.install_libraries_from_repository(library_list=library_list.repository)
 
-        if len(library_list_old.download) > 0:
+        if len(library_list.download) > 0:
             self.install_libraries_from_download(library_list=library_list.download)
 
     def install_libraries(self):
