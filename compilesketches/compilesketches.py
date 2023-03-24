@@ -826,8 +826,8 @@ class CompileSketches:
         print("\n")
 
 
-        if len(library_list.manager) > 0:
-            self.install_libraries_from_library_manager(library_list=library_list.manager)
+        if len(library_list2.manager) > 0:
+            self.install_libraries_from_library_manager(library_list=library_list2.manager)
 
         if len(library_list.path) > 0:
             self.install_libraries_from_path(library_list=library_list.path)
@@ -883,6 +883,9 @@ class CompileSketches:
         Keyword arguments:
         library_list -- list of dictionaries defining the dependencies
         """
+        print(library_list)
+        print(vars(library_list))
+
         lib_install_base_command = ["lib", "install"]
         # `arduino-cli lib install` fails if one of the libraries in the list has a dependency on another, but an
         # earlier version of the dependency is specified in the list. The solution is to install one library at a time
