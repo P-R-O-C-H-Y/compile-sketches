@@ -215,8 +215,9 @@ class CompileSketches:
 
         print("::group::Compiling ...")
         # DONE: Go trough JSON file and install library if not excluded target and compile sketch
-        # TODO: add library name to the results artifact
-        # TODO: Run multiple sketches defined by path or just a folder.
+        # DONE: add library name to the results artifact
+        # DONE: Run multiple sketches defined by path
+        # TODO: Test if only folder is defined for sketches.
         if self.use_json_file == True:
             #all_compilations_successful = True
             sketch_report_list = []
@@ -231,25 +232,19 @@ class CompileSketches:
                 #compile sketch if not target is not in excluded array
                 #append sketch report list with Library name and compilation result
 
-                #self.sketch_paths = [absolute_path(path=library['sketch_path'])]
                 absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
-                #print(self.sketch_paths)
                 self.sketch_paths = absolute_sketch_paths
-                print(self.sketch_paths)
                 sketch_list = self.find_sketches()
-                print(sketch_list)
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 if self.target not in library['exclude_targets']:
-                    compilation_result = self.compile_sketch(sketch_path=sketch_list[0], clean_build_cache=self.enable_warnings_report)
-                    #if not compilation_result.success:
-                    #    all_compilations_successful = False
+                    for sketch in sketch_list:
+                        compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
-                    # Store the size data for this sketch
-                    sketch_report = self.get_sketch_report(compilation_result=compilation_result)
-                    sketch_report[self.ReportKeys.library] = library['name']
-                    sketch_report_list.append(sketch_report)
-                    #sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+                        # Store the size data for this sketch
+                        sketch_report = self.get_sketch_report(compilation_result=compilation_result)
+                        sketch_report[self.ReportKeys.library] = library['name']
+                        sketch_report_list.append(sketch_report)
 
             sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
@@ -269,8 +264,6 @@ class CompileSketches:
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
-                #if not compilation_result.success:
-                #    all_compilations_successful = False
 
                 # Store the size data for this sketch
                 sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
@@ -279,9 +272,6 @@ class CompileSketches:
 
             self.create_sketches_report_file(sketches_report=sketches_report)
 
-            # if not all_compilations_successful:
-            #     print("::error::One or more compilations failed")
-            #     sys.exit(1)
         print("::endgroup::")
 
     def install_arduino_cli(self):
