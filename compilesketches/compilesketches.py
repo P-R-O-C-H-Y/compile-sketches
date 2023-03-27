@@ -115,6 +115,7 @@ class CompileSketches:
         maximum = "maximum"
         sketches = "sketches"
         library = "library"
+        target = "target"
 
     dependency_name_key = "name"
     dependency_version_key = "version"
@@ -1360,6 +1361,7 @@ class CompileSketches:
             self.ReportKeys.boards: [
                 {
                     self.ReportKeys.board: self.fqbn,
+                    self.ReportKeys.target: self.target,
                     self.ReportKeys.sketches: sketch_report_list
                 }
             ]
