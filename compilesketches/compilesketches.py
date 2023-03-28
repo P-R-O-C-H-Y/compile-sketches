@@ -1000,7 +1000,7 @@ class CompileSketches:
             output = compilation_data.stdout
 
         if not CompilationResult.success:
-            print("::error::Compilation failed")
+            print("::error::Compilation failed: ", sketch_path)
         else:
             time_summary = ""
             if diff_time > 60:
