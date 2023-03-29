@@ -244,7 +244,18 @@ class CompileSketches:
 
                         # Store the size data for this sketch
                         sketch_report = self.get_sketch_report(compilation_result=compilation_result)
-                        sketch_report[self.ReportKeys.library] = library['name']
+
+                        if self.dependency_name_key in library:
+                            sketch_report[self.ReportKeys.library] = library[self.dependency_name_key]
+                        elif self.dependency_destination_name_key in library:
+                            sketch_report[self.ReportKeys.library] = library[self.dependency_destination_name_key]
+                        elif self.dependency_source_path_key in library:
+                            os.environ["GITHUB_REPOSITORY"].split(sep="/")[1]
+                        elif self.dependency_source_url_key in library:
+                            sketch_report[self.ReportKeys.library] = library[self.dependency_source_url_key].rstrip("/").rsplit(sep="/", maxsplit=1)[1].rsplit(sep=".", maxsplit=1)[0]
+                        else:
+                            sketch_report[self.ReportKeys.library] = "Unknown"
+                        
                         sketch_report_list.append(sketch_report)
 
             sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
