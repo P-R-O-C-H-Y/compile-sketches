@@ -9,7 +9,7 @@
     },
     {
         "name": "FastLED",
-        "source-path:": "./",
+        "source-path": "./",
         "exclude_targets": [],
         "sketch_path": [
             "~/Arduino/libraries/FastLED/examples/Blink/Blink.ino"

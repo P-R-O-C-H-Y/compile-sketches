@@ -250,7 +250,7 @@ class CompileSketches:
                         elif self.dependency_destination_name_key in library:
                             sketch_report[self.ReportKeys.library] = library[self.dependency_destination_name_key]
                         elif self.dependency_source_path_key in library:
-                            os.environ["GITHUB_REPOSITORY"].split(sep="/")[1]
+                            sketch_report[self.ReportKeys.library] = os.environ["GITHUB_REPOSITORY"].split(sep="/")[1]
                         elif self.dependency_source_url_key in library:
                             sketch_report[self.ReportKeys.library] = library[self.dependency_source_url_key].rstrip("/").rsplit(sep="/", maxsplit=1)[1].rsplit(sep=".", maxsplit=1)[0]
                         else:
