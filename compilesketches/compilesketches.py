@@ -239,8 +239,10 @@ class CompileSketches:
                         self.install_library(lib)
 
                 absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
+                print("ABSOLUTE_sketch_paths = ",absolute_sketch_paths)
                 self.sketch_paths = absolute_sketch_paths
                 sketch_list = self.find_sketches()
+                print("sketch_list = ",sketch_list)
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 
