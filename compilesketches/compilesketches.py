@@ -1732,14 +1732,17 @@ def absolute_path(path):
     path -- the path to make absolute
     """
     # Make path into a pathlib.Path object, with ~ expanded
+    print("1.",path)
     path = pathlib.Path(path).expanduser()
+    print("2.",path)
     if not path.is_absolute():
         # path is relative
         path = pathlib.Path(os.environ["GITHUB_WORKSPACE"], path)
+        print("IF NOT: ",path)
 
     # Resolve .. and symlinks to get a true absolute path
     path = path.resolve()
-
+    print("3.",path)
     return path
 
 
