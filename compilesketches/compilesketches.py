@@ -735,9 +735,9 @@ class CompileSketches:
 
         # Clone to a temporary folder with script run duration to allow installing from subfolders of repos
         clone_folder = tempfile.mkdtemp(dir=self.temporary_directory.name, prefix="install_from_repository-")
-        self.clone_repository(url=url, git_ref=git_ref, destination_path=clone_folder.name)
+        self.clone_repository(url=url, git_ref=git_ref, destination_path=clone_folder)
         # Install to the final location
-        self.install_from_path(source_path=pathlib.Path(clone_folder.name, source_path),
+        self.install_from_path(source_path=pathlib.Path(clone_folder, source_path),
                                destination_parent_path=destination_parent_path,
                                destination_name=destination_name,
                                force=force)
