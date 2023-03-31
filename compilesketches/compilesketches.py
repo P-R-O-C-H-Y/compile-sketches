@@ -736,13 +736,15 @@ class CompileSketches:
             destination_name = url.rstrip("/").rsplit(sep="/", maxsplit=1)[1].rsplit(sep=".", maxsplit=1)[0]
 
         # Clone to a temporary folder with script run duration to allow installing from subfolders of repos
-        clone_folder = tempfile.mkdtemp(dir=self.temporary_directory.name, prefix="install_from_repository-")
+        #clone_folder = tempfile.mkdtemp(dir=self.temporary_directory.name, prefix="install_from_repository-")
+        clone_folder = tempfile.TemporaryDirectory(dir=self.temporary_directory.name, prefix="install_from_repository-")
         self.clone_repository(url=url, git_ref=git_ref, destination_path=clone_folder)
         # Install to the final location
         self.install_from_path(source_path=pathlib.Path(clone_folder, source_path),
                                destination_parent_path=destination_parent_path,
                                destination_name=destination_name,
                                force=force)
+        clone_folder.cleanup()
 
     def clone_repository(self, url, git_ref, destination_path):
         """Clone a Git repository to a specified location and check out the specified ref
