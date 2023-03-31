@@ -239,10 +239,8 @@ class CompileSketches:
                         self.install_library(lib)
 
                 absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
-                print("ABSOLUTE_sketch_paths = ",absolute_sketch_paths)
                 self.sketch_paths = absolute_sketch_paths
                 sketch_list = self.find_sketches()
-                print("sketch_list = ",sketch_list)
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 
@@ -736,15 +734,13 @@ class CompileSketches:
             destination_name = url.rstrip("/").rsplit(sep="/", maxsplit=1)[1].rsplit(sep=".", maxsplit=1)[0]
 
         # Clone to a temporary folder with script run duration to allow installing from subfolders of repos
-        #clone_folder = tempfile.mkdtemp(dir=self.temporary_directory.name, prefix="install_from_repository-")
-        clone_folder = tempfile.TemporaryDirectory(dir=self.temporary_directory.name, prefix="install_from_repository-")
+        clone_folder = tempfile.mkdtemp(dir=self.temporary_directory.name, prefix="install_from_repository-")
         self.clone_repository(url=url, git_ref=git_ref, destination_path=clone_folder.name)
         # Install to the final location
         self.install_from_path(source_path=pathlib.Path(clone_folder.name, source_path),
                                destination_parent_path=destination_parent_path,
                                destination_name=destination_name,
                                force=force)
-        clone_folder.cleanup()
 
     def clone_repository(self, url, git_ref, destination_path):
         """Clone a Git repository to a specified location and check out the specified ref
@@ -1734,17 +1730,13 @@ def absolute_path(path):
     path -- the path to make absolute
     """
     # Make path into a pathlib.Path object, with ~ expanded
-    print("1.",path)
     path = pathlib.Path(path).expanduser()
-    print("2.",path)
     if not path.is_absolute():
         # path is relative
         path = pathlib.Path(os.environ["GITHUB_WORKSPACE"], path)
-        print("IF NOT: ",path)
 
     # Resolve .. and symlinks to get a true absolute path
     path = path.resolve()
-    print("3.",path)
     return path
 
 
