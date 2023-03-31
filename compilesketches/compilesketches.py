@@ -233,7 +233,7 @@ class CompileSketches:
 
                 #install required libraries if exist
                 if 'required-libs' in library:
-                    for required_lib in library:
+                    for required_lib in library['required-libs']:
                         print(required_lib)
                         self.install_library(required_lib)
 
