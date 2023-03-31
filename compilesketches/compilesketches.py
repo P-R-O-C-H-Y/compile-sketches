@@ -234,6 +234,7 @@ class CompileSketches:
                 #install required libraries if exist
                 if 'required-libs' in library:
                     for required_lib in library:
+                        print(required_lib)
                         self.install_library(required_lib)
 
                 absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
@@ -422,11 +423,13 @@ class CompileSketches:
         Keyword arguments:
         dependency_list -- a list of dictionaries defining dependencies
         """
+        print(dependency_list)
         sorted_dependencies = self.Dependencies()
         for dependency in dependency_list:
             if dependency is not None:
                 if self.dependency_source_url_key in dependency:
                     # Repositories are identified by the URL starting with git:// or ending in .git
+                    print(dependency[self.dependency_source_url_key])
                     if (
                         dependency[self.dependency_source_url_key].rstrip("/").endswith(".git")
                         or dependency[self.dependency_source_url_key].startswith("git://")
@@ -794,6 +797,7 @@ class CompileSketches:
         """Install Arduino library."""
         library_list = self.Dependencies()
         library_list = self.sort_dependency_list([library])
+        print(library_list)
 
         if len(library_list.manager) > 0:
             self.install_libraries_from_library_manager(library_list=library_list.manager)
