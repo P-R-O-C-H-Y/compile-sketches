@@ -228,16 +228,21 @@ class CompileSketches:
                 libraries_list = json.load(f)
 
             for library in libraries_list:
-                #install library
+                #install tested library
                 self.install_library(library)
-                #compile sketch if not target is not in excluded array
-                #append sketch report list with Library name and compilation result
+
+                #install required libraries if exist
+                if 'required-libs' in library:
+                    for required_lib in library:
+                        self.install_library(required_lib)
 
                 absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
                 self.sketch_paths = absolute_sketch_paths
                 sketch_list = self.find_sketches()
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
+                
+                #compile sketch if not target is not in excluded array
                 if self.target not in library['exclude_targets']:
                     for sketch in sketch_list:
                         compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
@@ -255,7 +260,8 @@ class CompileSketches:
                             sketch_report[self.ReportKeys.library] = library[self.dependency_source_url_key].rstrip("/").rsplit(sep="/", maxsplit=1)[1].rsplit(sep=".", maxsplit=1)[0]
                         else:
                             sketch_report[self.ReportKeys.library] = "Unknown"
-                        
+
+                        #append sketch report list with Library name and compilation result
                         sketch_report_list.append(sketch_report)
 
             sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
