@@ -233,9 +233,10 @@ class CompileSketches:
 
                 #install required libraries if exist
                 if 'required-libs' in library:
-                    for required_lib in library['required-libs']:
-                        print(required_lib)
-                        self.install_library(required_lib)
+                    required_libs = {}
+                    required_libs = library['required-libs']
+                    print(required_libs)
+                    self.install_library(required_libs)
 
                 absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
                 self.sketch_paths = absolute_sketch_paths
