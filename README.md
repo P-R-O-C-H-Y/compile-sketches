@@ -1,11 +1,16 @@
-# `arduino/compile-sketches` action
+# `P-R-O-C-H-Y/compile-sketches` action
 
-[![Tests](https://github.com/arduino/compile-sketches/workflows/Test%20Python%20code/badge.svg)](https://github.com/arduino/compile-sketches/actions?workflow=Test+Python+code)
-[![Lint](https://github.com/arduino/compile-sketches/workflows/Lint%20Python%20code/badge.svg)](https://github.com/arduino/compile-sketches/actions?workflow=Lint+Python+code)
-[![Spell Check](https://github.com/arduino/compile-sketches/workflows/Spell%20Check/badge.svg)](https://github.com/arduino/compile-sketches/actions?workflow=Spell+Check)
-[![codecov](https://codecov.io/gh/arduino/compile-sketches/branch/main/graph/badge.svg?token=Uv6f1ebMZ4)](https://codecov.io/gh/arduino/compile-sketches)
+This action checks whether Arduino libraries (sketches) compile. 
+`P-R-O-C-H-Y/compile-sketches` and `P-R-O-C-H-Y/report-size-deltas` was changed print results to file or PR comment with edited data and format. Made to be primarly used for ESP32 Arduino core and Libraries made for ESP32 family.
 
-This action checks whether [Arduino](https://www.arduino.cc/) sketches compile and produces a report of data from the compilations.
+Forked from [arduino/compile-sketches](https://github.com/arduino/compile-sketches)
+
+README will be updated with new variables and usage.
+To check implementation of `P-R-O-C-H-Y/compile-sketches` and `P-R-O-C-H-Y/report-size-deltas` see these 2 repositories or templates provided:
+
+* [Arduino-ESP32]https://github.com/espressif/arduino-esp32 - used for compiling external libraries agains the repository's core.
+* [OpenAI-ESP32]https://github.com/me-no-dev/OpenAI-ESP32/ - used for testing library compilation.
+* `workflow_template.yaml` and `json_template_for_core.json`
 
 ## Table of contents
 
