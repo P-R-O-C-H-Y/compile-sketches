@@ -269,7 +269,7 @@ class CompileSketches:
             # On pull-request intall platform again, compile sketch and save to dict in place
             if os.environ["GITHUB_EVENT_NAME"] == "pull_request":
                 print("::endgroup::")
-                print("::group::Compiling sketches on base ref ...")
+                print("::group::Checkout base ref and install platform")
                 # Get data for the sketch at the base ref
                 # Get the head ref
                 repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
@@ -280,6 +280,9 @@ class CompileSketches:
 
                 # Install the platform dependency
                 self.install_platforms()
+
+                print("::endgroup::")
+                print("::group::Compiling sketches on base ref ...")
 
                 for library in libraries_list:
                     #install tested library
@@ -311,11 +314,8 @@ class CompileSketches:
                                     self.get_warning_count_from_output(compilation_result=previous_compilation_result)
                                 )
                             
-                            print(sketch)
                             for dict in sketch_report_list:
-                                print(dict[self.ReportKeys.name])
                                 if str(dict[self.ReportKeys.name]) == str(sketch):
-                                    print("match")
                                     dict[self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
                                         self.ReportKeys.absolute: previous_compilation_result.success 
                                     }
