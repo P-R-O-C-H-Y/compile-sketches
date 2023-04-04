@@ -266,6 +266,82 @@ class CompileSketches:
                         #append sketch report list with Library name and compilation result
                         sketch_report_list.append(sketch_report)
 
+            # On pull-request intall platform again, compile sketch and save to dict in place
+            if os.environ["GITHUB_EVENT_NAME"] == "pull_request":
+                # Get data for the sketch at the base ref
+                # Get the head ref
+                repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
+                original_git_ref = repository.head.object.hexsha
+
+                # git checkout the base ref
+                self.checkout_deltas_base_ref()
+
+                # Install the platform dependency
+                self.install_platforms()
+
+                for library in libraries_list:
+                    #install tested library
+                    self.install_library(library)
+                    
+                    #install required libraries if exist
+                    if 'required-libs' in library:
+                        required_libs = {}
+                        required_libs = library['required-libs']
+                        for lib in required_libs:
+                            self.install_library(lib)
+
+                    absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
+                    self.sketch_paths = absolute_sketch_paths
+                    sketch_list = self.find_sketches()
+
+                    if self.target not in library['exclude_targets']:
+                        for sketch in sketch_list:
+
+                            # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
+                            # only the first sketch compilation's warning count would reflect warnings from cached code
+
+                            # Compile the sketch again
+                            print("Compiling previous version of sketch to determine memory usage change")
+                            previous_compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+
+                            #previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
+                            if self.enable_warnings_report:
+                                previous_warning_count = (
+                                    self.get_warning_count_from_output(compilation_result=previous_compilation_result)
+                                )
+
+
+                            for dict in sketch_report_list:
+                                if dict[self.ReportKeys.name] == sketch:
+                                    dict[self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
+                                        self.ReportKeys.absolute: previous_compilation_result.success 
+                                    }
+
+                                    # Calculate the change in the warnings count
+                                    current_warnings = dict[self.ReportKeys.warnings][self.ReportKeys.current][self.ReportKeys.absolute]
+                                    if (
+                                        current_warnings == self.not_applicable_indicator
+                                        or previous_warning_count == self.not_applicable_indicator
+                                    ):
+                                        warnings_delta = self.not_applicable_indicator
+                                    else:
+                                        warnings_delta = current_warnings - previous_warning_count
+
+                                    # Print the warning count change to the log
+                                    print("Change in compiler warning count:", warnings_delta)
+
+                                    dict[self.ReportKeys.warnings][self.ReportKeys.previous] = {
+                                        self.ReportKeys.absolute: previous_warning_count
+                                    }
+                                    dict[self.ReportKeys.warnings][self.ReportKeys.delta] = {
+                                        self.ReportKeys.absolute: warnings_delta
+                                    }
+                                    break
+
+
+                # git checkout the head ref to return the repository to its previous state
+                repository.git.checkout(original_git_ref, recurse_submodules=True)
+
             sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
             self.create_sketches_report_file(sketches_report=sketches_report)
@@ -1037,45 +1113,44 @@ class CompileSketches:
         Keyword arguments:
         compilation_result -- object returned by compile_sketch()
         """
-        current_sizes = self.get_sizes_from_output(compilation_result=compilation_result)
+        #current_sizes = self.get_sizes_from_output(compilation_result=compilation_result)
         if self.enable_warnings_report:
             current_warning_count = self.get_warning_count_from_output(compilation_result=compilation_result)
         else:
             current_warning_count = None
-        previous_sizes = None
+        #previous_sizes = None
         previous_warning_count = None
         previous_compilation_result = None
 
-        if os.environ["GITHUB_EVENT_NAME"] == "pull_request":
-            # Get data for the sketch at the base ref
-            # Get the head ref
-            repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
-            original_git_ref = repository.head.object.hexsha
+        # if os.environ["GITHUB_EVENT_NAME"] == "pull_request":
+        #     # Get data for the sketch at the base ref
+        #     # Get the head ref
+        #     repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
+        #     original_git_ref = repository.head.object.hexsha
 
-            # git checkout the base ref
-            self.checkout_deltas_base_ref()
+        #     # git checkout the base ref
+        #     self.checkout_deltas_base_ref()
 
-            # Compile the sketch again
-            print("Compiling previous version of sketch to determine memory usage change")
-            previous_compilation_result = self.compile_sketch(sketch_path=compilation_result.sketch,
-                                                              clean_build_cache=self.enable_warnings_report)
+        #     # Compile the sketch again
+        #     print("Compiling previous version of sketch to determine memory usage change")
+        #     previous_compilation_result = self.compile_sketch(sketch_path=compilation_result.sketch,
+        #                                                       clean_build_cache=self.enable_warnings_report)
 
-            # git checkout the head ref to return the repository to its previous state
-            repository.git.checkout(original_git_ref, recurse_submodules=True)
+        #     # git checkout the head ref to return the repository to its previous state
+        #     repository.git.checkout(original_git_ref, recurse_submodules=True)
 
-            previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
-            if self.enable_warnings_report:
-                previous_warning_count = (
-                    self.get_warning_count_from_output(compilation_result=previous_compilation_result)
-                )
+        #     previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
+        #     if self.enable_warnings_report:
+        #         previous_warning_count = (
+        #             self.get_warning_count_from_output(compilation_result=previous_compilation_result)
+        #         )
 
         # Add global data for sketch to report
         sketch_report = {
             self.ReportKeys.name: str(path_relative_to_workspace(path=compilation_result.sketch)),
             self.ReportKeys.compilation_success: self.get_compilation_result(compilation_result, 
                                                                              previous_compilation_result),
-            self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,
-                                                         previous_sizes=previous_sizes),
+            #self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,previous_sizes=previous_sizes),
         }
         if self.enable_warnings_report:
             sketch_report[self.ReportKeys.warnings] = (
