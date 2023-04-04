@@ -314,7 +314,8 @@ class CompileSketches:
                             print(sketch)
                             for dict in sketch_report_list:
                                 print(dict[self.ReportKeys.name])
-                                if dict[self.ReportKeys.name] == sketch:
+                                if str(dict[self.ReportKeys.name]) == str(sketch):
+                                    print("match")
                                     dict[self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
                                         self.ReportKeys.absolute: previous_compilation_result.success 
                                     }
