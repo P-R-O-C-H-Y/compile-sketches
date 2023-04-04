@@ -214,7 +214,7 @@ class CompileSketches:
 
         print("::endgroup::")
 
-        print("::group::Compiling ...")
+        print("::group::Compiling sketches ...")
         # DONE: Go trough JSON file and install library if not excluded target and compile sketch
         # DONE: add library name to the results artifact
         # DONE: Run multiple sketches defined by path
@@ -268,6 +268,8 @@ class CompileSketches:
 
             # On pull-request intall platform again, compile sketch and save to dict in place
             if os.environ["GITHUB_EVENT_NAME"] == "pull_request":
+                print("::endgroup::")
+                print("::group::Compiling sketches on base ref ...")
                 # Get data for the sketch at the base ref
                 # Get the head ref
                 repository = git.Repo(path=os.environ["GITHUB_WORKSPACE"])
@@ -301,7 +303,6 @@ class CompileSketches:
                             # only the first sketch compilation's warning count would reflect warnings from cached code
 
                             # Compile the sketch again
-                            print("Compiling previous version of sketch to determine memory usage change")
                             previous_compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
                             #previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
