@@ -285,15 +285,16 @@ class CompileSketches:
                 print("::group::Compiling sketches on base ref ...")
 
                 for library in libraries_list:
+
                     #install tested library
-                    self.install_library(library)
+                    # self.install_library(library)
                     
                     #install required libraries if exist
-                    if 'required-libs' in library:
-                        required_libs = {}
-                        required_libs = library['required-libs']
-                        for lib in required_libs:
-                            self.install_library(lib)
+                    # if 'required-libs' in library:
+                    #     required_libs = {}
+                    #     required_libs = library['required-libs']
+                    #     for lib in required_libs:
+                    #         self.install_library(lib)
 
                     absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
                     self.sketch_paths = absolute_sketch_paths
