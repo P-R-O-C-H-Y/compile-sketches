@@ -320,7 +320,7 @@ class CompileSketches:
                             # replace for dict in sketch_report_list: + check with just count, as it compiles in same order as previous runs
                             #for dict in sketch_report_list:
                                 #if str(dict[self.ReportKeys.name]) == str(sketch):
-                                
+
                             sketch_report_list[sketch_count][self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
                                 self.ReportKeys.absolute: previous_compilation_result.success 
                             }
@@ -344,6 +344,7 @@ class CompileSketches:
                             sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.delta] = {
                                 self.ReportKeys.absolute: warnings_delta
                             }
+                            sketch_count += 1
                             #break
 
 
