@@ -284,17 +284,19 @@ class CompileSketches:
                 print("::endgroup::")
                 print("::group::Compiling sketches on base ref ...")
 
+                sketch_count = 0
+
                 for library in libraries_list:
 
                     #install tested library
-                    # self.install_library(library)
+                    self.install_library(library)
                     
                     #install required libraries if exist
-                    # if 'required-libs' in library:
-                    #     required_libs = {}
-                    #     required_libs = library['required-libs']
-                    #     for lib in required_libs:
-                    #         self.install_library(lib)
+                    if 'required-libs' in library:
+                        required_libs = {}
+                        required_libs = library['required-libs']
+                        for lib in required_libs:
+                            self.install_library(lib)
 
                     absolute_sketch_paths = [absolute_path(path=sketch_path) for sketch_path in library['sketch_path']]
                     self.sketch_paths = absolute_sketch_paths
@@ -315,32 +317,34 @@ class CompileSketches:
                                     self.get_warning_count_from_output(compilation_result=previous_compilation_result)
                                 )
                             
-                            for dict in sketch_report_list:
-                                if str(dict[self.ReportKeys.name]) == str(sketch):
-                                    dict[self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
-                                        self.ReportKeys.absolute: previous_compilation_result.success 
-                                    }
+                            # replace for dict in sketch_report_list: + check with just count, as it compiles in same order as previous runs
+                            #for dict in sketch_report_list:
+                                #if str(dict[self.ReportKeys.name]) == str(sketch):
+                                
+                            sketch_report_list[sketch_count][self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
+                                self.ReportKeys.absolute: previous_compilation_result.success 
+                            }
 
-                                    # Calculate the change in the warnings count
-                                    current_warnings = dict[self.ReportKeys.warnings][self.ReportKeys.current][self.ReportKeys.absolute]
-                                    if (
-                                        current_warnings == self.not_applicable_indicator
-                                        or previous_warning_count == self.not_applicable_indicator
-                                    ):
-                                        warnings_delta = self.not_applicable_indicator
-                                    else:
-                                        warnings_delta = current_warnings - previous_warning_count
+                            # Calculate the change in the warnings count
+                            current_warnings = sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.current][self.ReportKeys.absolute]
+                            if (
+                                current_warnings == self.not_applicable_indicator
+                                or previous_warning_count == self.not_applicable_indicator
+                            ):
+                                warnings_delta = self.not_applicable_indicator
+                            else:
+                                warnings_delta = current_warnings - previous_warning_count
 
-                                    # Print the warning count change to the log
-                                    print("Change in compiler warning count:", warnings_delta)
+                            # Print the warning count change to the log
+                            print("Change in compiler warning count:", warnings_delta)
 
-                                    dict[self.ReportKeys.warnings][self.ReportKeys.previous] = {
-                                        self.ReportKeys.absolute: previous_warning_count
-                                    }
-                                    dict[self.ReportKeys.warnings][self.ReportKeys.delta] = {
-                                        self.ReportKeys.absolute: warnings_delta
-                                    }
-                                    break
+                            sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.previous] = {
+                                self.ReportKeys.absolute: previous_warning_count
+                            }
+                            sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.delta] = {
+                                self.ReportKeys.absolute: warnings_delta
+                            }
+                            #break
 
 
                 # git checkout the head ref to return the repository to its previous state
