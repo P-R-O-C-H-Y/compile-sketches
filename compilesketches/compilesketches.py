@@ -1461,9 +1461,9 @@ class CompileSketches:
             ]
         }
 
-        sizes_summary_report = self.get_sizes_summary_report(sketch_report_list=sketch_report_list)
-        if sizes_summary_report:
-            sketches_report[self.ReportKeys.boards][0][self.ReportKeys.sizes] = sizes_summary_report
+        # sizes_summary_report = self.get_sizes_summary_report(sketch_report_list=sketch_report_list)
+        # if sizes_summary_report:
+        #     sketches_report[self.ReportKeys.boards][0][self.ReportKeys.sizes] = sizes_summary_report
 
         warnings_summary_report = self.get_warnings_summary_report(sketch_report_list=sketch_report_list)
         if warnings_summary_report:
