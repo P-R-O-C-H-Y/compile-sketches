@@ -310,9 +310,10 @@ class CompileSketches:
                                 previous_warning_count = (
                                     self.get_warning_count_from_output(compilation_result=previous_compilation_result)
                                 )
-
-
+                            
+                            print(sketch)
                             for dict in sketch_report_list:
+                                print(dict[self.ReportKeys.name])
                                 if dict[self.ReportKeys.name] == sketch:
                                     dict[self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
                                         self.ReportKeys.absolute: previous_compilation_result.success 
