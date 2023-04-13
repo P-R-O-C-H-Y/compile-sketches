@@ -137,7 +137,7 @@ class CompileSketches:
         self.platforms = platforms
 
         self.target = target
-        self.exit_on_fail = exit_on_fail
+        self.exit_on_fail = parse_boolean_input(boolean_input=exit_on_fail)
 
         self.use_json_file = parse_boolean_input(boolean_input=use_json_file)
         if self.use_json_file == True:
@@ -1105,9 +1105,8 @@ class CompileSketches:
 
         if not CompilationResult.success:
             print("::error::Compilation failed: ", sketch_path)
-            print("Exit-on-fail = ", self.exit_on_fail)
             if self.exit_on_fail == True:
-                print("::error::Aborting action")
+                print("::error::Aborting action, because exit-on-fail = ",self.exit_on_fail)
                 sys.exit(1)
         else:
             time_summary = ""
