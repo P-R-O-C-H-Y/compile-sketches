@@ -91,6 +91,7 @@ runs:
         INPUT_TARGET: ${{ inputs.target }}
         INPUT_USE-JSON-FILE: ${{ inputs.use-json-file }}
         INPUT_JSON-PATH: ${{ inputs.json-path }}
+        INPUT_EXIT-ON-FAIL: ${{ inputs.exit-on-fail }}
       run: |
         source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
         "${{ steps.setup.outputs.python-command }}" "${{ github.action_path }}/compilesketches/compilesketches.py"
