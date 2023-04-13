@@ -251,7 +251,7 @@ class CompileSketches:
                     for sketch in sketch_list:
                         compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
-                        if self.exit_on_fail:
+                        if self.exit_on_fail == True:
                             if not compilation_result.success:
                                 print("::error::Compilation failed, aborting action")
                                 sys.exit(1)
@@ -318,7 +318,7 @@ class CompileSketches:
                             # Compile the sketch again
                             previous_compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
                             
-                            if self.exit_on_fail:
+                            if self.exit_on_fail == True:
                                 if not previous_compilation_result.success:
                                     print("::error::Compilation failed, aborting action")
                                     sys.exit(1)
@@ -380,7 +380,7 @@ class CompileSketches:
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
-                if self.exit_on_fail:
+                if self.exit_on_fail == True:
                     if not compilation_result.success:
                         print("::error::Compilation failed, aborting action")
                         sys.exit(1)
