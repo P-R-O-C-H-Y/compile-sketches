@@ -1106,7 +1106,7 @@ class CompileSketches:
         if not CompilationResult.success:
             print("::error::Compilation failed: ", sketch_path)
             if self.exit_on_fail == True:
-                print("::error::Aborting action, because exit-on-fail = ",self.exit_on_fail)
+                print("::error::Aborting action, because exit-on-fail: ",self.exit_on_fail)
                 sys.exit(1)
         else:
             time_summary = ""
