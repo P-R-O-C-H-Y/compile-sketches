@@ -57,6 +57,10 @@ inputs:
     description: 'If JSON file is used as input, this sets the path to the JSON file'
     default: ''
     required: true
+  exit-on-fail:
+    description: 'Exit action and throw error, if some sketch fails to compile'
+    default: 'false'
+    required: false
 
 runs:
   using: composite

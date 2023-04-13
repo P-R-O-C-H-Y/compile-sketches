@@ -54,7 +54,8 @@ def main():
         sketches_report_path=os.environ["INPUT_SKETCHES-REPORT-PATH"],
         target=os.environ["INPUT_TARGET"],
         use_json_file=os.environ["INPUT_USE-JSON-FILE"],
-        json_path=os.environ["INPUT_JSON-PATH"]
+        json_path=os.environ["INPUT_JSON-PATH"],
+        exit_on_fail=os.environ["INPUT_EXIT-ON-FAIL"]
     )
 
     compile_sketches.compile_sketches()
@@ -126,7 +127,7 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, use_json_file, json_path):
+                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, use_json_file, json_path, exit_on_fail):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
@@ -136,6 +137,7 @@ class CompileSketches:
         self.platforms = platforms
 
         self.target = target
+        self.exit_on_fail = exit_on_fail
 
         self.use_json_file = parse_boolean_input(boolean_input=use_json_file)
         if self.use_json_file == True:
@@ -249,6 +251,11 @@ class CompileSketches:
                     for sketch in sketch_list:
                         compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
+                        if self.exit_on_fail:
+                            if not compilation_result.success:
+                                print("::error::Compilation failed, aborting action")
+                                sys.exit(1)
+
                         # Store the size data for this sketch
                         sketch_report = self.get_sketch_report(compilation_result=compilation_result)
 
@@ -310,6 +317,11 @@ class CompileSketches:
 
                             # Compile the sketch again
                             previous_compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+                            
+                            if self.exit_on_fail:
+                                if not previous_compilation_result.success:
+                                    print("::error::Compilation failed, aborting action")
+                                    sys.exit(1)
 
                             #previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
                             if self.enable_warnings_report:
@@ -359,8 +371,6 @@ class CompileSketches:
             self.install_libraries()
 
             # Compile all sketches under the paths specified by the sketch-paths input
-            
-            #all_compilations_successful = True
             sketch_report_list = []
             print(self.sketch_paths)
             sketch_list = self.find_sketches()
@@ -369,6 +379,11 @@ class CompileSketches:
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+
+                if self.exit_on_fail:
+                    if not compilation_result.success:
+                        print("::error::Compilation failed, aborting action")
+                        sys.exit(1)
 
                 # Store the size data for this sketch
                 sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
