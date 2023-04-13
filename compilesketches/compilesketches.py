@@ -251,11 +251,6 @@ class CompileSketches:
                     for sketch in sketch_list:
                         compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
-                        if self.exit_on_fail == True:
-                            if not compilation_result.success:
-                                print("::error::Compilation failed, aborting action")
-                                sys.exit(1)
-
                         # Store the size data for this sketch
                         sketch_report = self.get_sketch_report(compilation_result=compilation_result)
 
@@ -317,11 +312,6 @@ class CompileSketches:
 
                             # Compile the sketch again
                             previous_compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
-                            
-                            if self.exit_on_fail == True:
-                                if not previous_compilation_result.success:
-                                    print("::error::Compilation failed, aborting action")
-                                    sys.exit(1)
 
                             #previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
                             if self.enable_warnings_report:
@@ -379,11 +369,6 @@ class CompileSketches:
                 # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                 # only the first sketch compilation's warning count would reflect warnings from cached code
                 compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
-
-                if self.exit_on_fail == True:
-                    if not compilation_result.success:
-                        print("::error::Compilation failed, aborting action")
-                        sys.exit(1)
 
                 # Store the size data for this sketch
                 sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
@@ -1120,6 +1105,9 @@ class CompileSketches:
 
         if not CompilationResult.success:
             print("::error::Compilation failed: ", sketch_path)
+            if self.exit_on_fail == True:
+                print("::error::Aborting action")
+                sys.exit(1)
         else:
             time_summary = ""
             if diff_time > 60:
