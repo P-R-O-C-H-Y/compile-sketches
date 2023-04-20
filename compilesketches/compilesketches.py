@@ -140,8 +140,8 @@ class CompileSketches:
         else:
             parsed_fqbn_arg = parse_fqbn_arg_input(fqbn_arg=fqbn_arg)
             self.fqbn = parsed_fqbn_arg["fqbn"]
+            self.additional_url = parsed_fqbn_arg["additional_url"]
 
-        self.additional_url = parsed_fqbn_arg["additional_url"]
         self.platforms = platforms
 
         self.target = target
@@ -377,7 +377,7 @@ class CompileSketches:
             if self.multiple_fqbn == True:
                 with open(self.fqbn_path) as f:
                     fqbn_list = json.load(f)
-                    
+
                 for fqbn in fqbn_list:
                     self.fqbn = {"fqbn": fqbn, "additional_url": None}
                     for sketch in sketch_list:
