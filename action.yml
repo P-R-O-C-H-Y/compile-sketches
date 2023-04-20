@@ -61,6 +61,10 @@ inputs:
     description: 'Exit action and throw error, if some sketch fails to compile'
     default: 'false'
     required: false
+  multiple-fqbn:
+    description: 'Set to true, if fqbn is an array of multiple fqbns'
+    default: 'false'
+    required: false
 
 runs:
   using: composite
@@ -92,6 +96,7 @@ runs:
         INPUT_USE-JSON-FILE: ${{ inputs.use-json-file }}
         INPUT_JSON-PATH: ${{ inputs.json-path }}
         INPUT_EXIT-ON-FAIL: ${{ inputs.exit-on-fail }}
+        INPUT_MULTIPLE-FQBN: ${{ inputs.multiple-fqbn }}
       run: |
         source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
         "${{ steps.setup.outputs.python-command }}" "${{ github.action_path }}/compilesketches/compilesketches.py"

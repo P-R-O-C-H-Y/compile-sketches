@@ -55,7 +55,8 @@ def main():
         target=os.environ["INPUT_TARGET"],
         use_json_file=os.environ["INPUT_USE-JSON-FILE"],
         json_path=os.environ["INPUT_JSON-PATH"],
-        exit_on_fail=os.environ["INPUT_EXIT-ON-FAIL"]
+        exit_on_fail=os.environ["INPUT_EXIT-ON-FAIL"],
+        multiple_fqbn=os.environ["INPUT_MULTIPLE-FQBN"]
     )
 
     compile_sketches.compile_sketches()
@@ -127,12 +128,17 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, use_json_file, json_path, exit_on_fail):
+                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, use_json_file, json_path, exit_on_fail, multiple_fqbn):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
-        parsed_fqbn_arg = parse_fqbn_arg_input(fqbn_arg=fqbn_arg)
-        self.fqbn = parsed_fqbn_arg["fqbn"]
+        self.multiple_fqbn = parse_boolean_input(boolean_input=multiple_fqbn)
+        if self.multiple_fqbn == True:
+            self.fqbn_array = fqbn_arg
+        else:
+            parsed_fqbn_arg = parse_fqbn_arg_input(fqbn_arg=fqbn_arg)
+            self.fqbn = parsed_fqbn_arg["fqbn"]
+
         self.additional_url = parsed_fqbn_arg["additional_url"]
         self.platforms = platforms
 
@@ -365,17 +371,32 @@ class CompileSketches:
             print(self.sketch_paths)
             sketch_list = self.find_sketches()
             print(sketch_list)
-            for sketch in sketch_list:
-                # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
-                # only the first sketch compilation's warning count would reflect warnings from cached code
-                compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+            if self.multiple_fqbn == True:
+                for fqbn in self.fqbn_array:
+                    self.fqbn = {"fqbn": fqbn, "additional_url": None}
+                    for sketch in sketch_list:
+                        # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
+                        # only the first sketch compilation's warning count would reflect warnings from cached code
+                        compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
-                # Store the size data for this sketch
-                sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+                        # Store the size data for this sketch
+                        sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
 
-            sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
+                sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
-            self.create_sketches_report_file(sketches_report=sketches_report)
+                self.create_sketches_report_file(sketches_report=sketches_report)
+            else:
+                for sketch in sketch_list:
+                    # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
+                    # only the first sketch compilation's warning count would reflect warnings from cached code
+                    compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
+
+                    # Store the size data for this sketch
+                    sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
+
+                sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
+
+                self.create_sketches_report_file(sketches_report=sketches_report)
 
         print("::endgroup::")
 
