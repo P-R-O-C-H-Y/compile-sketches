@@ -379,7 +379,7 @@ class CompileSketches:
                     fqbn_list = json.load(f)
 
                 for fqbn in fqbn_list:
-                    self.fqbn = {"fqbn": fqbn, "additional_url": None}
+                    self.fqbn = fqbn
                     for sketch in sketch_list:
                         # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
                         # only the first sketch compilation's warning count would reflect warnings from cached code
