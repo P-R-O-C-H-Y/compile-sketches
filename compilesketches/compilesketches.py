@@ -370,6 +370,7 @@ class CompileSketches:
 
             # Compile all sketches under the paths specified by the sketch-paths input
             sketch_report_list = []
+            all_compilations_successful = True
 
             print(self.sketch_paths)
             sketch_list = self.find_sketches()
@@ -385,12 +386,18 @@ class CompileSketches:
                         # only the first sketch compilation's warning count would reflect warnings from cached code
                         compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
+                        if not compilation_result.success:
+                            all_compilations_successful = False
                         # Store the size data for this sketch
                         sketch_report_list.append(self.get_sketch_report(compilation_result=compilation_result))
 
                 sketches_report = self.get_sketches_report(sketch_report_list=sketch_report_list)
 
                 self.create_sketches_report_file(sketches_report=sketches_report)
+
+                if not all_compilations_successful:
+                    print("::error::One or more compilations failed")
+                    sys.exit(1)
             else:
                 for sketch in sketch_list:
                     # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
@@ -1109,7 +1116,7 @@ class CompileSketches:
         if self.cli_compile_flags is not None:
             compilation_command.extend(self.cli_compile_flags)
         compilation_command.append(sketch_path)
-        
+
         if clean_build_cache:
             for cache_path in pathlib.Path("/tmp").glob(pattern="arduino*"):
                 shutil.rmtree(path=cache_path)
@@ -1130,7 +1137,7 @@ class CompileSketches:
             output = compilation_data.stdout
 
         if not CompilationResult.success:
-            print("::error::Compilation failed: ", sketch_path)
+            print("::error::Compilation failed: ",self.fqbn ,",", sketch_path)
             if self.exit_on_fail == True:
                 print("::error::Aborting action, because exit-on-fail: ",self.exit_on_fail)
                 sys.exit(1)
