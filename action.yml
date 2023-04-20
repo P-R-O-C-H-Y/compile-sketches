@@ -7,8 +7,8 @@ inputs:
     required: true
   fqbn:
     description: 'Full qualified board name, with Boards Manager URL if needed'
-    default: 'arduino:avr:uno'
-    required: true
+    default: 'espressif:esp32:esp32'
+    required: false
   libraries:
     description: 'YAML-format list of library dependencies to install'
     default: '- source-path: ./'
@@ -65,6 +65,10 @@ inputs:
     description: 'Set to true, if fqbn is an array of multiple fqbns'
     default: 'false'
     required: false
+  multiple-fqbn-path:
+    description: 'If multiple FQBNs are used as input, this sets the path to the JSON file with the fqbns'
+    default: ''
+    required: false
 
 runs:
   using: composite
@@ -97,6 +101,7 @@ runs:
         INPUT_JSON-PATH: ${{ inputs.json-path }}
         INPUT_EXIT-ON-FAIL: ${{ inputs.exit-on-fail }}
         INPUT_MULTIPLE-FQBN: ${{ inputs.multiple-fqbn }}
+        INPUT_MULTIPLE-FQBN-PATH: ${{ inputs.multiple-fqbn-path }}
       run: |
         source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
         "${{ steps.setup.outputs.python-command }}" "${{ github.action_path }}/compilesketches/compilesketches.py"

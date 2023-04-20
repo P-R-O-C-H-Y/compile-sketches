@@ -56,7 +56,8 @@ def main():
         use_json_file=os.environ["INPUT_USE-JSON-FILE"],
         json_path=os.environ["INPUT_JSON-PATH"],
         exit_on_fail=os.environ["INPUT_EXIT-ON-FAIL"],
-        multiple_fqbn=os.environ["INPUT_MULTIPLE-FQBN"]
+        multiple_fqbn=os.environ["INPUT_MULTIPLE-FQBN"],
+        multiple_fqbn_path=os.environ["INPUT_MULTIPLE-FQBN-PATH"]
     )
 
     compile_sketches.compile_sketches()
@@ -128,13 +129,14 @@ class CompileSketches:
     latest_release_indicator = "latest"
 
     def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, use_json_file, json_path, exit_on_fail, multiple_fqbn):
+                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, 
+                 use_json_file, json_path, exit_on_fail, multiple_fqbn, multiple_fqbn_path):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
         self.multiple_fqbn = parse_boolean_input(boolean_input=multiple_fqbn)
         if self.multiple_fqbn == True:
-            self.fqbn_array = fqbn_arg
+            self.fqbn_path = multiple_fqbn_path
         else:
             parsed_fqbn_arg = parse_fqbn_arg_input(fqbn_arg=fqbn_arg)
             self.fqbn = parsed_fqbn_arg["fqbn"]
@@ -368,11 +370,15 @@ class CompileSketches:
 
             # Compile all sketches under the paths specified by the sketch-paths input
             sketch_report_list = []
+
             print(self.sketch_paths)
             sketch_list = self.find_sketches()
             print(sketch_list)
             if self.multiple_fqbn == True:
-                for fqbn in self.fqbn_array:
+                with open(self.fqbn_path) as f:
+                    fqbn_list = json.load(f)
+                    
+                for fqbn in fqbn_list:
                     self.fqbn = {"fqbn": fqbn, "additional_url": None}
                     for sketch in sketch_list:
                         # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
