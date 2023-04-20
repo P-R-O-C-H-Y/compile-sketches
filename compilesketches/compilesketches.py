@@ -1127,7 +1127,9 @@ class CompileSketches:
 
         # Group compilation output to make the log easy to read
         # https://github.com/actions/toolkit/blob/master/docs/commands.md#group-and-ungroup-log-lines
-        print("::group::Compiling for ",self.fqbn," sketch:", path_relative_to_workspace(path=sketch_path))
+        fqbn_component_list = self.fqbn.split(sep=":")
+        fqbn_board_name = fqbn_component_list[2]
+        print("::group::Compiling for ", fqbn_board_name, " sketch:", path_relative_to_workspace(path=sketch_path))
         print(compilation_data.stdout)
         print("::endgroup::")
 
@@ -1137,7 +1139,7 @@ class CompileSketches:
             output = compilation_data.stdout
 
         if not CompilationResult.success:
-            print("::error::Compilation failed: ",self.fqbn ,",", sketch_path)
+            print("::error::Compilation failed: ", fqbn_board_name, ",", sketch_path)
             if self.exit_on_fail == True:
                 print("::error::Aborting action, because exit-on-fail: ",self.exit_on_fail)
                 sys.exit(1)
