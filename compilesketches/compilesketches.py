@@ -1109,8 +1109,7 @@ class CompileSketches:
         if self.cli_compile_flags is not None:
             compilation_command.extend(self.cli_compile_flags)
         compilation_command.append(sketch_path)
-        print(sketch_path)
-
+        
         if clean_build_cache:
             for cache_path in pathlib.Path("/tmp").glob(pattern="arduino*"):
                 shutil.rmtree(path=cache_path)
@@ -1121,7 +1120,7 @@ class CompileSketches:
 
         # Group compilation output to make the log easy to read
         # https://github.com/actions/toolkit/blob/master/docs/commands.md#group-and-ungroup-log-lines
-        print("::group::Compiling sketch:", path_relative_to_workspace(path=sketch_path))
+        print("::group::Compiling for ",self.fqbn," sketch:", path_relative_to_workspace(path=sketch_path))
         print(compilation_data.stdout)
         print("::endgroup::")
 
