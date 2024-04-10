@@ -235,6 +235,12 @@ class CompileSketches:
         for sketch in sketch_list:
             # It's necessary to clear the cache between each compilation to get a true compiler warning count, otherwise
             # only the first sketch compilation's warning count would reflect warnings from cached code
+
+            # If in the sketch folder exists .skip.<target> file, skip the compilation
+            if os.path.exists(os.path.join(sketch, ".skip." + self.target)):
+                print("Skipping compilation of sketch", sketch, "for target", self.target)
+                continue
+
             compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
             if not compilation_result.success:
                 all_compilations_successful = False
@@ -280,25 +286,25 @@ class CompileSketches:
                         self.get_warning_count_from_output(compilation_result=previous_compilation_result)
                     )
                 
-                # Calculate the change in the warnings count
-                current_warnings = sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.current][self.ReportKeys.absolute]
-                if (
-                    current_warnings == self.not_applicable_indicator
-                    or previous_warning_count == self.not_applicable_indicator
-                ):
-                    warnings_delta = self.not_applicable_indicator
-                else:
-                    warnings_delta = current_warnings - previous_warning_count
+                    # Calculate the change in the warnings count
+                    current_warnings = sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.current][self.ReportKeys.absolute]
+                    if (
+                        current_warnings == self.not_applicable_indicator
+                        or previous_warning_count == self.not_applicable_indicator
+                    ):
+                        warnings_delta = self.not_applicable_indicator
+                    else:
+                        warnings_delta = current_warnings - previous_warning_count
 
-                # Print the warning count change to the log
-                print("Change in compiler warning count:", warnings_delta)
+                    # Print the warning count change to the log
+                    print("Change in compiler warning count:", warnings_delta)
 
-                sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.previous] = {
-                    self.ReportKeys.absolute: previous_warning_count
-                }
-                sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.delta] = {
-                    self.ReportKeys.absolute: warnings_delta
-                }
+                    sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.previous] = {
+                        self.ReportKeys.absolute: previous_warning_count
+                    }
+                    sketch_report_list[sketch_count][self.ReportKeys.warnings][self.ReportKeys.delta] = {
+                        self.ReportKeys.absolute: warnings_delta
+                    }
                 sketch_count += 1
 
             repository.git.checkout(original_git_ref, recurse_submodules=True)
