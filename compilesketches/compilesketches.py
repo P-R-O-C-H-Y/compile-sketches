@@ -269,6 +269,11 @@ class CompileSketches:
             sketch_count = 0
             
             for sketch in sketch_list:
+                # If in the sketch folder exists .skip.<target> file, skip the compilation
+                if os.path.exists(os.path.join(sketch, ".skip." + self.target)):
+                    print("Skipping compilation of sketch", sketch, "for target", self.target)
+                    continue
+
                 previous_compilation_result = self.compile_sketch(sketch_path=sketch, clean_build_cache=self.enable_warnings_report)
 
                 sketch_report_list[sketch_count][self.ReportKeys.compilation_success][self.ReportKeys.previous] = { 
