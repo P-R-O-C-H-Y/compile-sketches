@@ -282,8 +282,9 @@ class CompileSketches:
                 current_sizes = sketch_report_list[sketch_count][self.ReportKeys.current_sizes]
                 previous_sizes = self.get_sizes_from_output(compilation_result=previous_compilation_result)
 
-                sketch_report_list[sketch_count] = {
-                    self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,previous_sizes=previous_sizes),
+                sketch_report_list[sketch_count][self.ReportKeys.sizes] = {
+                    #self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,previous_sizes=previous_sizes),
+                    self.get_sizes_report(current_sizes=current_sizes,previous_sizes=previous_sizes)
                 }
 
                 if self.enable_warnings_report:
