@@ -318,8 +318,9 @@ class CompileSketches:
 
         if not all_compilations_successful:
             print("::error::One or more compilations failed")
-            print("::endgroup::")
-            sys.exit(1)
+            if self.exit_on_fail:
+                print("::endgroup::")
+                sys.exit(1)
 
         print("::endgroup::")
 
