@@ -729,6 +729,10 @@ class CompileSketches:
         platform_vendor = platform[self.dependency_name_key].split(sep=":")[0]
         platform_architecture = platform[self.dependency_name_key].rsplit(sep=":", maxsplit=1)[1]
 
+        # print verbose platform vendor and architecture
+        self.verbose_print("Platform vendor:", platform_vendor)
+        self.verbose_print("Platform architecture:", platform_architecture)
+
         # Default to installing to the sketchbook
         platform_installation_path.path = self.user_platforms_path.joinpath(platform_vendor, platform_architecture)
 
@@ -738,21 +742,23 @@ class CompileSketches:
         self.run_arduino_cli_command(command=["core", "update-index"])
         # Use Arduino CLI to get the list of installed platforms
         command_data = self.run_arduino_cli_command(command=["core", "list", "--format", "json"])
-        installed_platform_list = json.loads(command_data.stdout)
-        for installed_platform in installed_platform_list:
-            if installed_platform[self.cli_json_key("core list", "id")] == platform[self.dependency_name_key]:
-                # The platform has been installed via Board Manager, so do an overwrite
-                platform_installation_path.path = (
-                    self.board_manager_platforms_path.joinpath(
+        installed_platform_list = self.cli_core_list_platform_list(json.loads(command_data.stdout))
+        
+        self.verbose_print("Installed platforms:", installed_platform_list)
+        # Skip if installed_platform_list is not None
+        if installed_platform_list is not None:
+            for installed_platform in installed_platform_list:
+                if installed_platform[self.cli_json_key("core list", "id")] == platform[self.dependency_name_key]:
+                    # The platform has been installed via Board Manager, so do an overwrite
+                    platform_installation_path.path = self.board_manager_platforms_path.joinpath(
                         platform_vendor,
                         "hardware",
                         platform_architecture,
-                        installed_platform[self.cli_json_key("core list", "installed_version")]
+                        installed_platform[self.cli_json_key("core list", "installed_version")],
                     )
-                )
-                platform_installation_path.is_overwrite = True
+                    platform_installation_path.is_overwrite = True
 
-                break
+                    break
 
         return platform_installation_path
 
