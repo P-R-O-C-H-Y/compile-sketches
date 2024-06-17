@@ -780,19 +780,20 @@ class CompileSketches:
         installed_platform_list = self.cli_core_list_platform_list(json.loads(command_data.stdout))
         
         self.verbose_print("Installed platforms:", installed_platform_list)
+        # Skip if installed_platform_list is not None
+        if installed_platform_list is not None:
+            for installed_platform in installed_platform_list:
+                if installed_platform[self.cli_json_key("core list", "id")] == platform[self.dependency_name_key]:
+                    # The platform has been installed via Board Manager, so do an overwrite
+                    platform_installation_path.path = self.board_manager_platforms_path.joinpath(
+                        platform_vendor,
+                        "hardware",
+                        platform_architecture,
+                        installed_platform[self.cli_json_key("core list", "installed_version")],
+                    )
+                    platform_installation_path.is_overwrite = True
 
-        for installed_platform in installed_platform_list:
-            if installed_platform[self.cli_json_key("core list", "id")] == platform[self.dependency_name_key]:
-                # The platform has been installed via Board Manager, so do an overwrite
-                platform_installation_path.path = self.board_manager_platforms_path.joinpath(
-                    platform_vendor,
-                    "hardware",
-                    platform_architecture,
-                    installed_platform[self.cli_json_key("core list", "installed_version")],
-                )
-                platform_installation_path.is_overwrite = True
-
-                break
+                    break
 
         return platform_installation_path
 
