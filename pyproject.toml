@@ -1,0 +1,42 @@
+[tool.black]
+line-length = 120
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.12.4"
+GitPython = "3.1.43"
+PyGithub = "2.3.0"
+PyYAML = "6.0.1"
+semver = "3.0.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "24.4.2"
+codespell = "2.3.0"
+coverage = "7.5.3"
+pytest = "8.2.2"
+pytest-mock = "3.14.0"
+flake8 = "7.0.0"
+pep8-naming = "0.14.1"
+yamllint = "1.35.1"
+
+[tool.poetry.group.external]
+# Provided only for use by boards platforms
+# NOTE: This group is a temporary workaround that will be removed at the 2.0.0 release of the action.
+optional = true
+
+[tool.poetry.group.external.dependencies]
+pyserial = "3.5"
+
+# The dependencies in this group are installed using pipx; NOT Poetry. The use of a `poetry` section is a hack required
+# in order to be able to manage updates of these dependencies via Dependabot, as used for all other dependencies.
+[tool.poetry.group.pipx]
+optional = true
+
+[tool.poetry.group.pipx.dependencies]
+poetry = "1.8.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -27,18 +27,24 @@ def main():
         print("::warning::The size-report-sketch input is no longer used")
 
     if "INPUT_SIZE-DELTAS-REPORT-FOLDER-NAME" in os.environ:
-        print("::warning::The size-deltas-report-folder-name input is deprecated. Use the equivalent input: "
-              "sketches-report-path instead.")
+        print(
+            "::warning::The size-deltas-report-folder-name input is deprecated. Use the equivalent input: "
+            "sketches-report-path instead."
+        )
         os.environ["INPUT_SKETCHES-REPORT-PATH"] = os.environ["INPUT_SIZE-DELTAS-REPORT-FOLDER-NAME"]
 
     if "INPUT_ENABLE-SIZE-DELTAS-REPORT" in os.environ:
-        print("::warning::The enable-size-deltas-report input is deprecated. Use the equivalent input: "
-              "enable-deltas-report instead.")
+        print(
+            "::warning::The enable-size-deltas-report input is deprecated. Use the equivalent input: "
+            "enable-deltas-report instead."
+        )
         os.environ["INPUT_ENABLE-DELTAS-REPORT"] = os.environ["INPUT_ENABLE-SIZE-DELTAS-REPORT"]
 
     if "INPUT_ENABLE-SIZE-TRENDS-REPORT" in os.environ:
-        print("::warning::The size trends report feature has been moved to a dedicated action. See the documentation "
-              "at https://github.com/arduino/actions/tree/report-size-trends-action/libraries/report-size-trends")
+        print(
+            "::warning::The size trends report feature has been moved to a dedicated action. See the documentation "
+            "at https://github.com/arduino/actions/tree/report-size-trends-action/libraries/report-size-trends"
+        )
 
     compile_sketches = CompileSketches(
         cli_version=os.environ["INPUT_CLI-VERSION"],
@@ -128,9 +134,26 @@ class CompileSketches:
 
     latest_release_indicator = "latest"
 
-    def __init__(self, cli_version, fqbn_arg, platforms, libraries, sketch_paths, cli_compile_flags, verbose,
-                 github_token, enable_deltas_report, enable_warnings_report, sketches_report_path, target, 
-                 use_json_file, json_path, exit_on_fail, multiple_fqbn, multiple_fqbn_path):
+    def __init__(
+        self,
+        cli_version,
+        fqbn_arg,
+        platforms,
+        libraries,
+        sketch_paths,
+        cli_compile_flags,
+        verbose,
+        github_token,
+        enable_deltas_report,
+        enable_warnings_report,
+        sketches_report_path,
+        target,
+        use_json_file,
+        json_path,
+        exit_on_fail,
+        multiple_fqbn,
+        multiple_fqbn_path,
+    ):
         """Process, store, and validate the action's inputs."""
         self.cli_version = cli_version
 
@@ -206,8 +229,10 @@ class CompileSketches:
         try:
             repository_api = self.github_api.get_repo(full_name_or_id=os.environ["GITHUB_REPOSITORY"])
         except github.UnknownObjectException:
-            print("::error::Unable to access repository data. Please specify the github-token input in your "
-                  "workflow configuration.")
+            print(
+                "::error::Unable to access repository data. Please specify the github-token input in your "
+                "workflow configuration."
+            )
             sys.exit(1)
 
         return repository_api.get_pull(number=pull_request_number).base.ref
@@ -424,7 +449,7 @@ class CompileSketches:
             # The Arduino CLI has no root folder, so just install the arduino-cli executable from the archive root
             source_path="arduino-cli",
             destination_parent_path=self.arduino_cli_installation_path,
-            force=False
+            force=False,
         )
 
         # Configure the location of the Arduino CLI user directory
@@ -478,10 +503,12 @@ class CompileSketches:
                 print("::error::Archive source path:", source_path, "not found")
                 sys.exit(1)
 
-            self.install_from_path(source_path=absolute_source_path,
-                                   destination_parent_path=destination_parent_path,
-                                   destination_name=destination_name,
-                                   force=force)
+            self.install_from_path(
+                source_path=absolute_source_path,
+                destination_parent_path=destination_parent_path,
+                destination_name=destination_name,
+                force=force,
+            )
 
     def install_platforms(self):
         """Install Arduino boards platforms."""
@@ -548,14 +575,14 @@ class CompileSketches:
             if dependency is not None:
                 if self.dependency_source_url_key in dependency:
                     # Repositories are identified by the URL starting with git:// or ending in .git
-                    if (
-                        dependency[self.dependency_source_url_key].rstrip("/").endswith(".git")
-                        or dependency[self.dependency_source_url_key].startswith("git://")
-                    ):
+                    if dependency[self.dependency_source_url_key].rstrip("/").endswith(".git") or dependency[
+                        self.dependency_source_url_key
+                    ].startswith("git://"):
                         sorted_dependencies.repository.append(dependency)
-                    elif re.match(
-                        pattern=".*/package_.*index.json", string=dependency[self.dependency_source_url_key]
-                    ) is not None:
+                    elif (
+                        re.match(pattern=".*/package_.*index.json", string=dependency[self.dependency_source_url_key])
+                        is not None
+                    ):
                         # URLs that match the filename requirements of the package_index.json specification are assumed
                         # to be additional Board Manager URLs (platform index)
                         sorted_dependencies.manager.append(dependency)
@@ -601,12 +628,14 @@ class CompileSketches:
             core_install_command.append(self.get_manager_dependency_name(platform))
 
             # Download the platform index for the platform
-            self.run_arduino_cli_command(command=core_update_index_command,
-                                         enable_output=self.get_run_command_output_level())
+            self.run_arduino_cli_command(
+                command=core_update_index_command, enable_output=self.get_run_command_output_level()
+            )
 
             # Install the platform
-            self.run_arduino_cli_command(command=core_install_command,
-                                         enable_output=self.get_run_command_output_level())
+            self.run_arduino_cli_command(
+                command=core_install_command, enable_output=self.get_run_command_output_level()
+            )
 
     def get_manager_dependency_name(self, dependency):
         """Return the appropriate name value for a manager dependency. This allows the NAME@VERSION syntax to be used
@@ -648,9 +677,9 @@ class CompileSketches:
         full_command.extend(command)
         if self.verbose:
             full_command.extend(["--log-level", debug_output_log_level, "--verbose"])
-        arduino_cli_output = self.run_command(command=full_command,
-                                              enable_output=enable_output,
-                                              exit_on_failure=exit_on_failure)
+        arduino_cli_output = self.run_command(
+            command=full_command, enable_output=enable_output, exit_on_failure=exit_on_failure
+        )
 
         return arduino_cli_output
 
@@ -668,15 +697,19 @@ class CompileSketches:
         command_data = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
         # Print output if appropriate
-        if (enable_output == self.RunCommandOutput.ALWAYS
-            or (command_data.returncode != 0
-                and (enable_output == self.RunCommandOutput.ON_FAILURE
-                     or enable_output == self.RunCommandOutput.ALWAYS))):
-
+        if enable_output == self.RunCommandOutput.ALWAYS or (
+            command_data.returncode != 0
+            and (enable_output == self.RunCommandOutput.ON_FAILURE or enable_output == self.RunCommandOutput.ALWAYS)
+        ):
             # Cast args to string and join them to form a string
-            print("::group::Running command:", list_to_string(command_data.args), "\n",
-                  command_data.stdout, "\n",
-                  "::endgroup::")
+            print(
+                "::group::Running command:",
+                list_to_string(command_data.args),
+                "\n",
+                command_data.stdout,
+                "\n",
+                "::endgroup::",
+            )
 
             if command_data.returncode != 0:
                 print("::error::Command failed")
@@ -704,10 +737,12 @@ class CompileSketches:
             platform_installation_path = self.get_platform_installation_path(platform=platform)
 
             # Install the platform
-            self.install_from_path(source_path=source_path,
-                                   destination_parent_path=platform_installation_path.path.parent,
-                                   destination_name=platform_installation_path.path.name,
-                                   force=platform_installation_path.is_overwrite)
+            self.install_from_path(
+                source_path=source_path,
+                destination_parent_path=platform_installation_path.path.parent,
+                destination_name=platform_installation_path.path.name,
+                force=platform_installation_path.is_overwrite,
+            )
 
     def get_platform_installation_path(self, platform):
         """Determines the correct installation path for the given platform and returns an object with the attributes:
@@ -738,17 +773,15 @@ class CompileSketches:
         self.run_arduino_cli_command(command=["core", "update-index"])
         # Use Arduino CLI to get the list of installed platforms
         command_data = self.run_arduino_cli_command(command=["core", "list", "--format", "json"])
-        installed_platform_list = json.loads(command_data.stdout)
+        installed_platform_list = self.cli_core_list_platform_list(json.loads(command_data.stdout))
         for installed_platform in installed_platform_list:
             if installed_platform[self.cli_json_key("core list", "id")] == platform[self.dependency_name_key]:
                 # The platform has been installed via Board Manager, so do an overwrite
-                platform_installation_path.path = (
-                    self.board_manager_platforms_path.joinpath(
-                        platform_vendor,
-                        "hardware",
-                        platform_architecture,
-                        installed_platform[self.cli_json_key("core list", "installed_version")]
-                    )
+                platform_installation_path.path = self.board_manager_platforms_path.joinpath(
+                    platform_vendor,
+                    "hardware",
+                    platform_architecture,
+                    installed_platform[self.cli_json_key("core list", "installed_version")],
                 )
                 platform_installation_path.is_overwrite = True
 
@@ -810,12 +843,14 @@ class CompileSketches:
 
             destination_path = self.get_platform_installation_path(platform=platform)
 
-            self.install_from_repository(url=platform[self.dependency_source_url_key],
-                                         git_ref=git_ref,
-                                         source_path=source_path,
-                                         destination_parent_path=destination_path.path.parent,
-                                         destination_name=destination_path.path.name,
-                                         force=destination_path.is_overwrite)
+            self.install_from_repository(
+                url=platform[self.dependency_source_url_key],
+                git_ref=git_ref,
+                source_path=source_path,
+                destination_parent_path=destination_path.path.parent,
+                destination_name=destination_path.path.name,
+                force=destination_path.is_overwrite,
+            )
 
     def get_repository_dependency_ref(self, dependency):
         """Return the appropriate git ref value for a repository dependency
@@ -830,13 +865,9 @@ class CompileSketches:
 
         return git_ref
 
-    def install_from_repository(self,
-                                url,
-                                git_ref,
-                                source_path,
-                                destination_parent_path,
-                                destination_name=None,
-                                force=False):
+    def install_from_repository(
+        self, url, git_ref, source_path, destination_parent_path, destination_name=None, force=False
+    ):
         """Install by cloning a repository
 
         Keyword arguments:
@@ -856,10 +887,12 @@ class CompileSketches:
         clone_folder = tempfile.mkdtemp(dir=self.temporary_directory.name, prefix="install_from_repository-")
         self.clone_repository(url=url, git_ref=git_ref, destination_path=clone_folder)
         # Install to the final location
-        self.install_from_path(source_path=pathlib.Path(clone_folder, source_path),
-                               destination_parent_path=destination_parent_path,
-                               destination_name=destination_name,
-                               force=force)
+        self.install_from_path(
+            source_path=pathlib.Path(clone_folder, source_path),
+            destination_parent_path=destination_parent_path,
+            destination_name=destination_name,
+            force=force,
+        )
 
     def clone_repository(self, url, git_ref, destination_path):
         """Clone a Git repository to a specified location and check out the specified ref
@@ -905,11 +938,13 @@ class CompileSketches:
 
             destination_path = self.get_platform_installation_path(platform=platform)
 
-            self.install_from_download(url=platform[self.dependency_source_url_key],
-                                       source_path=source_path,
-                                       destination_parent_path=destination_path.path.parent,
-                                       destination_name=destination_path.path.name,
-                                       force=destination_path.is_overwrite)
+            self.install_from_download(
+                url=platform[self.dependency_source_url_key],
+                source_path=source_path,
+                destination_parent_path=destination_path.path.parent,
+                destination_name=destination_path.path.name,
+                force=destination_path.is_overwrite,
+            )
 
     def install_library(self, library):
         """Install Arduino library."""
@@ -937,8 +972,7 @@ class CompileSketches:
             library_list = self.sort_dependency_list(libraries.value)
         else:
             # libraries input uses the old space-separated list syntax
-            library_list.manager = [{self.dependency_name_key: library_name}
-                                    for library_name in libraries.value]
+            library_list.manager = [{self.dependency_name_key: library_name} for library_name in libraries.value]
 
             # The original behavior of the action was to assume the root of the repo is a library to be installed, so
             # that behavior is retained when using the old input syntax
@@ -993,9 +1027,7 @@ class CompileSketches:
             if self.dependency_destination_name_key in library:
                 # If a name was specified, use it
                 destination_name = library[self.dependency_destination_name_key]
-            elif (
-                source_path == absolute_path(os.environ["GITHUB_WORKSPACE"])
-            ):
+            elif source_path == absolute_path(os.environ["GITHUB_WORKSPACE"]):
                 # If source_path is the root of the workspace (i.e., repository root), name the folder according to the
                 # repository name, otherwise it will unexpectedly be "workspace"
                 destination_name = os.environ["GITHUB_REPOSITORY"].split(sep="/")[1]
@@ -1003,10 +1035,12 @@ class CompileSketches:
                 # Use the existing folder name
                 destination_name = None
 
-            self.install_from_path(source_path=source_path,
-                                   destination_parent_path=self.libraries_path,
-                                   destination_name=destination_name,
-                                   force=True)
+            self.install_from_path(
+                source_path=source_path,
+                destination_parent_path=self.libraries_path,
+                destination_name=destination_name,
+                force=True,
+            )
 
     def install_libraries_from_repository(self, library_list):
         """Install libraries by cloning Git repositories
@@ -1032,12 +1066,14 @@ class CompileSketches:
             else:
                 source_path = "."
 
-            self.install_from_repository(url=library[self.dependency_source_url_key],
-                                         git_ref=git_ref,
-                                         source_path=source_path,
-                                         destination_parent_path=self.libraries_path,
-                                         destination_name=destination_name,
-                                         force=True)
+            self.install_from_repository(
+                url=library[self.dependency_source_url_key],
+                git_ref=git_ref,
+                source_path=source_path,
+                destination_parent_path=self.libraries_path,
+                destination_name=destination_name,
+                force=True,
+            )
 
     def install_libraries_from_download(self, library_list):
         """Install libraries by downloading them
@@ -1057,11 +1093,13 @@ class CompileSketches:
             else:
                 destination_name = None
 
-            self.install_from_download(url=library[self.dependency_source_url_key],
-                                       source_path=source_path,
-                                       destination_parent_path=self.libraries_path,
-                                       destination_name=destination_name,
-                                       force=True)
+            self.install_from_download(
+                url=library[self.dependency_source_url_key],
+                source_path=source_path,
+                destination_parent_path=self.libraries_path,
+                destination_name=destination_name,
+                force=True,
+            )
 
     def find_sketches(self):
         """Return a list of all sketches under the paths specified in the sketch paths list recursively."""
@@ -1122,7 +1160,8 @@ class CompileSketches:
                 shutil.rmtree(path=cache_path)
         start_time = time.monotonic()
         compilation_data = self.run_arduino_cli_command(
-            command=compilation_command, enable_output=self.RunCommandOutput.NONE, exit_on_failure=False)
+            command=compilation_command, enable_output=self.RunCommandOutput.NONE, exit_on_failure=False
+        )
         diff_time = time.monotonic() - start_time
 
         # Group compilation output to make the log easy to read
@@ -1200,9 +1239,8 @@ class CompileSketches:
             #self.ReportKeys.sizes: self.get_sizes_report(current_sizes=current_sizes,previous_sizes=previous_sizes),
         }
         if self.enable_warnings_report:
-            sketch_report[self.ReportKeys.warnings] = (
-                self.get_warnings_report(current_warnings=current_warning_count,
-                                         previous_warnings=previous_warning_count)
+            sketch_report[self.ReportKeys.warnings] = self.get_warnings_report(
+                current_warnings=current_warning_count, previous_warnings=previous_warning_count
             )
 
         return sketch_report
@@ -1223,8 +1261,8 @@ class CompileSketches:
                     # The regular expression for the total memory
                     self.ReportKeys.maximum: (
                         r"Sketch uses [0-9]+ bytes .*of program storage space\. Maximum is ([0-9]+) bytes."
-                    )
-                }
+                    ),
+                },
             },
             {
                 "name": "RAM for global variables",
@@ -1232,9 +1270,9 @@ class CompileSketches:
                     self.ReportKeys.absolute: r"Global variables use ([0-9]+) bytes .*of dynamic memory",
                     self.ReportKeys.maximum: (
                         r"Global variables use [0-9]+ bytes .*of dynamic memory.*\. Maximum is ([0-9]+) bytes."
-                    )
-                }
-            }
+                    ),
+                },
+            },
         ]
 
         sizes = []
@@ -1244,26 +1282,30 @@ class CompileSketches:
                 # Set default memory usage value, to be used if memory usage can't be determined
                 self.ReportKeys.absolute: self.not_applicable_indicator,
                 self.ReportKeys.maximum: self.not_applicable_indicator,
-                self.ReportKeys.relative: self.not_applicable_indicator
+                self.ReportKeys.relative: self.not_applicable_indicator,
             }
 
             if compilation_result.success is True:
                 # Determine memory usage of the sketch by parsing Arduino CLI's output
-                size_data = self.get_size_data_from_output(compilation_output=compilation_result.output,
-                                                           memory_type=memory_type,
-                                                           size_data_type=self.ReportKeys.absolute)
+                size_data = self.get_size_data_from_output(
+                    compilation_output=compilation_result.output,
+                    memory_type=memory_type,
+                    size_data_type=self.ReportKeys.absolute,
+                )
                 if size_data:
                     size[self.ReportKeys.absolute] = size_data
 
-                    size_data = self.get_size_data_from_output(compilation_output=compilation_result.output,
-                                                               memory_type=memory_type,
-                                                               size_data_type=self.ReportKeys.maximum)
+                    size_data = self.get_size_data_from_output(
+                        compilation_output=compilation_result.output,
+                        memory_type=memory_type,
+                        size_data_type=self.ReportKeys.maximum,
+                    )
                     if size_data:
                         size[self.ReportKeys.maximum] = size_data
 
                         size[self.ReportKeys.relative] = round(
                             (100 * size[self.ReportKeys.absolute] / size[self.ReportKeys.maximum]),
-                            self.relative_size_report_decimal_places
+                            self.relative_size_report_decimal_places,
                         )
 
             sizes.append(size)
@@ -1293,7 +1335,9 @@ class CompileSketches:
             # - upload.maximum_size is not defined in boards.txt
             # RAM usage will not be reported in the Arduino CLI output
             self.verbose_print(
-                "::warning::Unable to determine the: \"" + size_data_type + "\" value for memory type: \""
+                '::warning::Unable to determine the: "'
+                + size_data_type
+                + '" value for memory type: "'
                 + memory_type["name"]
                 + "\". The board's platform may not have been configured to provide this information."
             )
@@ -1326,12 +1370,8 @@ class CompileSketches:
         return (
             self.enable_deltas_report
             and (
-                any(size.get(self.ReportKeys.absolute) != self.not_applicable_indicator for
-                    size in current_sizes)
-                or (
-                    current_warnings is not None
-                    and current_warnings != self.not_applicable_indicator
-                )
+                any(size.get(self.ReportKeys.absolute) != self.not_applicable_indicator for size in current_sizes)
+                or (current_warnings is not None and current_warnings != self.not_applicable_indicator)
             )
         )
 
@@ -1341,12 +1381,14 @@ class CompileSketches:
 
         # git fetch the deltas base ref
         origin_remote = repository.remotes["origin"]
-        origin_remote.fetch(refspec=self.deltas_base_ref,
-                            verbose=self.verbose,
-                            no_tags=True,
-                            prune=True,
-                            depth=1,
-                            recurse_submodules=True)
+        origin_remote.fetch(
+            refspec=self.deltas_base_ref,
+            verbose=self.verbose,
+            no_tags=True,
+            prune=True,
+            depth=1,
+            recurse_submodules=True,
+        )
 
         # git checkout the deltas base ref
         repository.git.checkout(self.deltas_base_ref, recurse_submodules=True)
@@ -1365,8 +1407,7 @@ class CompileSketches:
 
         sizes_report = []
         for current_size, previous_size in zip(current_sizes, previous_sizes):
-            sizes_report.append(self.get_size_report(current_size=current_size,
-                                                     previous_size=previous_size))
+            sizes_report.append(self.get_size_report(current_size=current_size, previous_size=previous_size))
 
         return sizes_report
 
@@ -1383,8 +1424,8 @@ class CompileSketches:
             self.ReportKeys.maximum: current_size[self.ReportKeys.maximum],
             self.ReportKeys.current: {
                 self.ReportKeys.absolute: current_size[self.ReportKeys.absolute],
-                self.ReportKeys.relative: current_size[self.ReportKeys.relative]
-            }
+                self.ReportKeys.relative: current_size[self.ReportKeys.relative],
+            },
         }
 
         if previous_size is not None:
@@ -1395,7 +1436,7 @@ class CompileSketches:
             ):
                 absolute_delta = self.not_applicable_indicator
             else:
-                absolute_delta = (current_size[self.ReportKeys.absolute] - previous_size[self.ReportKeys.absolute])
+                absolute_delta = current_size[self.ReportKeys.absolute] - previous_size[self.ReportKeys.absolute]
 
             if (
                 absolute_delta == self.not_applicable_indicator
@@ -1404,8 +1445,10 @@ class CompileSketches:
                 relative_delta = self.not_applicable_indicator
             else:
                 # Calculate from absolute values to avoid rounding errors
-                relative_delta = round((100 * absolute_delta / size_report[self.ReportKeys.maximum]),
-                                       self.relative_size_report_decimal_places)
+                relative_delta = round(
+                    (100 * absolute_delta / size_report[self.ReportKeys.maximum]),
+                    self.relative_size_report_decimal_places,
+                )
 
             # Size deltas reports are enabled
             # Print the memory usage change data to the log
@@ -1416,11 +1459,11 @@ class CompileSketches:
 
             size_report[self.ReportKeys.previous] = {
                 self.ReportKeys.absolute: previous_size[self.ReportKeys.absolute],
-                self.ReportKeys.relative: previous_size[self.ReportKeys.relative]
+                self.ReportKeys.relative: previous_size[self.ReportKeys.relative],
             }
             size_report[self.ReportKeys.delta] = {
                 self.ReportKeys.absolute: absolute_delta,
-                self.ReportKeys.relative: relative_delta
+                self.ReportKeys.relative: relative_delta,
             }
 
         return size_report
@@ -1441,10 +1484,7 @@ class CompileSketches:
         if previous_warnings is not None:
             # Deltas reports are enabled
             # Calculate the change in the warnings count
-            if (
-                current_warnings == self.not_applicable_indicator
-                or previous_warnings == self.not_applicable_indicator
-            ):
+            if current_warnings == self.not_applicable_indicator or previous_warnings == self.not_applicable_indicator:
                 warnings_delta = self.not_applicable_indicator
             else:
                 warnings_delta = current_warnings - previous_warnings
@@ -1452,12 +1492,8 @@ class CompileSketches:
             # Print the warning count change to the log
             print("Change in compiler warning count:", warnings_delta)
 
-            warnings_report[self.ReportKeys.previous] = {
-                self.ReportKeys.absolute: previous_warnings
-            }
-            warnings_report[self.ReportKeys.delta] = {
-                self.ReportKeys.absolute: warnings_delta
-            }
+            warnings_report[self.ReportKeys.previous] = {self.ReportKeys.absolute: previous_warnings}
+            warnings_report[self.ReportKeys.delta] = {self.ReportKeys.absolute: warnings_delta}
 
         return warnings_report
 
@@ -1492,10 +1528,9 @@ class CompileSketches:
 
         sketches_report = {
             self.ReportKeys.commit_hash: current_git_ref,
-            self.ReportKeys.commit_url: ("https://github.com/"
-                                         + os.environ["GITHUB_REPOSITORY"]
-                                         + "/commit/"
-                                         + current_git_ref),
+            self.ReportKeys.commit_url: (
+                "https://github.com/" + os.environ["GITHUB_REPOSITORY"] + "/commit/" + current_git_ref
+            ),
             # The action is currently designed to only compile for one board per run, so the boards list will only have
             # a single element, but this provides a report format that can accommodate the possible addition of multiple
             # boards support
@@ -1527,92 +1562,74 @@ class CompileSketches:
         sizes_summary_report = []
         for sketch_report in sketch_report_list:
             for size_report in sketch_report[self.ReportKeys.sizes]:
-                if self.ReportKeys.delta in size_report:
-                    # Determine the sizes_summary_report index for this memory type
-                    size_summary_report_index_list = [
-                        index for index, size_summary in enumerate(sizes_summary_report)
-                        if size_summary.get(self.ReportKeys.name) == size_report[self.ReportKeys.name]
+                # Determine the sizes_summary_report index for this memory type
+                size_summary_report_index_list = [
+                    index
+                    for index, size_summary in enumerate(sizes_summary_report)
+                    if size_summary.get(self.ReportKeys.name) == size_report[self.ReportKeys.name]
+                ]
+                if not size_summary_report_index_list:
+                    # There is no existing entry in the summary list for this memory type, so create one
+                    sizes_summary_report.append({self.ReportKeys.name: size_report[self.ReportKeys.name]})
+                    size_summary_report_index = len(sizes_summary_report) - 1
+                else:
+                    size_summary_report_index = size_summary_report_index_list[0]
+
+                if (
+                    self.ReportKeys.maximum not in sizes_summary_report[size_summary_report_index]
+                    or sizes_summary_report[size_summary_report_index][self.ReportKeys.maximum]
+                    == self.not_applicable_indicator
+                ):
+                    sizes_summary_report[size_summary_report_index][self.ReportKeys.maximum] = size_report[
+                        self.ReportKeys.maximum
                     ]
-                    if not size_summary_report_index_list:
-                        # There is no existing entry in the summary list for this memory type, so create one
-                        sizes_summary_report.append(
-                            {
-                                self.ReportKeys.name: size_report[self.ReportKeys.name],
-                                self.ReportKeys.maximum: size_report[self.ReportKeys.maximum],
-                                self.ReportKeys.delta: {
-                                    self.ReportKeys.absolute: {
-                                        self.ReportKeys.minimum: size_report[self.ReportKeys.delta][
-                                            self.ReportKeys.absolute],
-                                        self.ReportKeys.maximum: size_report[self.ReportKeys.delta][
-                                            self.ReportKeys.absolute]
-                                    },
-                                    self.ReportKeys.relative: {
-                                        self.ReportKeys.minimum: size_report[self.ReportKeys.delta][
-                                            self.ReportKeys.relative],
-                                        self.ReportKeys.maximum: size_report[self.ReportKeys.delta][
-                                            self.ReportKeys.relative]
-                                    },
-                                }
-                            }
-                        )
-                    else:
-                        size_summary_report_index = size_summary_report_index_list[0]
+
+                if self.ReportKeys.delta in size_report:
+                    if (
+                        self.ReportKeys.delta not in sizes_summary_report[size_summary_report_index]
+                        or sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
+                            self.ReportKeys.absolute
+                        ][self.ReportKeys.minimum]
+                        == self.not_applicable_indicator
+                    ):
+                        sizes_summary_report[size_summary_report_index][self.ReportKeys.delta] = {
+                            self.ReportKeys.absolute: {
+                                self.ReportKeys.minimum: size_report[self.ReportKeys.delta][self.ReportKeys.absolute],
+                                self.ReportKeys.maximum: size_report[self.ReportKeys.delta][self.ReportKeys.absolute],
+                            },
+                            self.ReportKeys.relative: {
+                                self.ReportKeys.minimum: size_report[self.ReportKeys.delta][self.ReportKeys.relative],
+                                self.ReportKeys.maximum: size_report[self.ReportKeys.delta][self.ReportKeys.relative],
+                            },
+                        }
+                    elif size_report[self.ReportKeys.delta][self.ReportKeys.absolute] != self.not_applicable_indicator:
+                        if (
+                            size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
+                            < sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
+                                self.ReportKeys.absolute
+                            ][self.ReportKeys.minimum]
+                        ):
+                            sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
+                                self.ReportKeys.absolute
+                            ][self.ReportKeys.minimum] = size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
+
+                            sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
+                                self.ReportKeys.relative
+                            ][self.ReportKeys.minimum] = size_report[self.ReportKeys.delta][self.ReportKeys.relative]
 
                         if (
-                            sizes_summary_report[size_summary_report_index][
-                                self.ReportKeys.maximum] == self.not_applicable_indicator
-                        ):
-                            sizes_summary_report[size_summary_report_index][
-                                self.ReportKeys.maximum] = size_report[self.ReportKeys.maximum]
-
-                        if (
-                            sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                self.ReportKeys.absolute][self.ReportKeys.minimum] == self.not_applicable_indicator
+                            size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
+                            > sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
+                                self.ReportKeys.absolute
+                            ][self.ReportKeys.maximum]
                         ):
                             sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                self.ReportKeys.absolute][self.ReportKeys.minimum] = size_report[self.ReportKeys.delta][
-                                self.ReportKeys.absolute]
+                                self.ReportKeys.absolute
+                            ][self.ReportKeys.maximum] = size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
 
                             sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                self.ReportKeys.relative][self.ReportKeys.minimum] = size_report[self.ReportKeys.delta][
-                                self.ReportKeys.relative]
-
-                            sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                self.ReportKeys.absolute][self.ReportKeys.maximum] = size_report[self.ReportKeys.delta][
-                                self.ReportKeys.absolute]
-
-                            sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                self.ReportKeys.relative][self.ReportKeys.maximum] = size_report[self.ReportKeys.delta][
-                                self.ReportKeys.relative]
-
-                        elif size_report[self.ReportKeys.delta][self.ReportKeys.absolute] != (
-                            self.not_applicable_indicator
-                        ):
-                            if (size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
-                                < sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                    self.ReportKeys.absolute][self.ReportKeys.minimum]):
-                                sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                    self.ReportKeys.absolute][self.ReportKeys.minimum] = (
-                                    size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
-                                )
-
-                                sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                    self.ReportKeys.relative][self.ReportKeys.minimum] = (
-                                    size_report[self.ReportKeys.delta][self.ReportKeys.relative]
-                                )
-
-                            if (size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
-                                > sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                    self.ReportKeys.absolute][self.ReportKeys.maximum]):
-                                sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                    self.ReportKeys.absolute][self.ReportKeys.maximum] = (
-                                    size_report[self.ReportKeys.delta][self.ReportKeys.absolute]
-                                )
-
-                                sizes_summary_report[size_summary_report_index][self.ReportKeys.delta][
-                                    self.ReportKeys.relative][self.ReportKeys.maximum] = (
-                                    size_report[self.ReportKeys.delta][self.ReportKeys.relative]
-                                )
+                                self.ReportKeys.relative
+                            ][self.ReportKeys.maximum] = size_report[self.ReportKeys.delta][self.ReportKeys.relative]
 
         return sizes_summary_report
 
@@ -1629,14 +1646,11 @@ class CompileSketches:
                 self.ReportKeys.warnings in sketch_report
                 and self.ReportKeys.delta in sketch_report[self.ReportKeys.warnings]
             ):
-                sketch_report_delta = (
-                    sketch_report[self.ReportKeys.warnings][self.ReportKeys.delta][self.ReportKeys.absolute]
-                )
+                sketch_report_delta = sketch_report[self.ReportKeys.warnings][self.ReportKeys.delta][
+                    self.ReportKeys.absolute
+                ]
 
-                if (
-                    summary_report_minimum is None
-                    or summary_report_minimum == self.not_applicable_indicator
-                ):
+                if summary_report_minimum is None or summary_report_minimum == self.not_applicable_indicator:
                     summary_report_minimum = sketch_report_delta
                 elif (
                     sketch_report_delta != self.not_applicable_indicator
@@ -1644,10 +1658,7 @@ class CompileSketches:
                 ):
                     summary_report_minimum = sketch_report_delta
 
-                if (
-                    summary_report_maximum is None
-                    or summary_report_maximum == self.not_applicable_indicator
-                ):
+                if summary_report_maximum is None or summary_report_maximum == self.not_applicable_indicator:
                     summary_report_maximum = sketch_report_delta
                 elif (
                     sketch_report_delta != self.not_applicable_indicator
@@ -1660,7 +1671,7 @@ class CompileSketches:
                 self.ReportKeys.delta: {
                     self.ReportKeys.absolute: {
                         self.ReportKeys.minimum: summary_report_minimum,
-                        self.ReportKeys.maximum: summary_report_maximum
+                        self.ReportKeys.maximum: summary_report_maximum,
                     }
                 }
             }
@@ -1683,9 +1694,30 @@ class CompileSketches:
         sketches_report_path.mkdir(parents=True, exist_ok=True)
 
         # Write the memory usage data to a file named according to the FQBN
-        with open(file=sketches_report_path.joinpath(self.fqbn.replace(":", "-") + ".json"), mode="w",
-                  encoding="utf-8") as report_file:
+        with open(
+            file=sketches_report_path.joinpath(self.fqbn.replace(":", "-") + ".json"), mode="w", encoding="utf-8"
+        ) as report_file:
             json.dump(obj=sketches_report, fp=report_file, indent=2)
+
+    def cli_core_list_platform_list(self, data):
+        """Extract the list of platform data from the `arduino-cli core list` command output according to the Arduino
+        CLI version in use.
+
+        Keyword arguments:
+        data -- Arduino CLI command output data
+        """
+        # Interface was changed at this Arduino CLI release:
+        # https://arduino.github.io/arduino-cli/dev/UPGRADING/#cli-changed-json-output-for-some-lib-core-config-board-and-sketch-commands
+        first_new_interface_version = "1.0.0"
+
+        if (
+            not semver.VersionInfo.is_valid(version=self.cli_version)
+            or semver.Version.parse(version=self.cli_version).compare(other=first_new_interface_version) >= 0
+        ):
+            # cli_version is either "latest" (which will now always be >=1.0.0) or an explicit version >=1.0.0
+            return data["platforms"]
+
+        return data
 
     def cli_json_key(self, command, key_name):
         """Return the appropriate JSON output key name for the Arduino CLI version in use.
