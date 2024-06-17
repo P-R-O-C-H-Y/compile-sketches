@@ -1,0 +1,84 @@
+name: Test Python code
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/test-python.yml'
+      - 'action-setup.sh'
+      - 'compilesketches/**'
+
+  push:
+    paths:
+      - '.github/workflows/test-python.yml'
+      - 'action-setup.sh'
+      - 'compilesketches/**'
+
+  # Catch issues resulting from new patch releases of Python in the APT repository
+  schedule:
+    # run every Tuesday at 3 AM UTC
+    - cron: "0 3 * * 2"
+
+  # workflow_dispatch event allows the workflow to be triggered manually
+  # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+
+  # repository_dispatch event allows the workflow to be triggered via the GitHub API
+  # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#repository_dispatch
+  repository_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHON_PROJECT_PATH: ${GITHUB_WORKSPACE}/compilesketches
+      PYTHON_PROJECT_TESTS_PATH: ${GITHUB_WORKSPACE}/compilesketches/tests
+      COVERAGE_DATA_FILENAME: coverage.xml
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run the set up script
+        id: setup
+        run: |
+          "${{ github.workspace }}/action-setup.sh"
+
+      - name: Install test dependencies
+        run: |
+          source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
+          "${{ steps.setup.outputs.python-command }}" \
+            -m \
+              pip install \
+                --requirement "${{ env.PYTHON_PROJECT_TESTS_PATH }}/requirements.txt"
+
+      - name: Run Python unit tests and record code coverage data
+        run: |
+          source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
+          export PYTHONPATH="${{ env.PYTHON_PROJECT_PATH }}"
+          "${{ steps.setup.outputs.python-command }}" \
+            -m \
+              coverage run \
+                --rcfile="${{ env.PYTHON_PROJECT_TESTS_PATH }}/.coveragerc" \
+                --source="${{ env.PYTHON_PROJECT_PATH }}" \
+                --module \
+                  pytest "${{ env.PYTHON_PROJECT_TESTS_PATH }}"
+          # Generate coverage data file for consumption by `codecov/codecov-action`.
+          # Otherwise that action generates the file using the system Python environment, which doesn't work.
+          "${{ steps.setup.outputs.python-command }}" \
+            -m \
+              coverage xml \
+                -o "${{ github.workspace }}/${{ env.COVERAGE_DATA_FILENAME }}"
+
+      - name: Display code coverage report
+        run: |
+          source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
+          "${{ steps.setup.outputs.python-command }}" \
+            -m \
+              coverage report
+
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ${{ env.COVERAGE_DATA_FILENAME }}
+          fail_ci_if_error: true

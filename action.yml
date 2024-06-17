@@ -1,65 +1,49 @@
-name: "Compile Arduino Sketches"
-description: >-
-  Checks whether Arduino sketches will compile and produces a report of data from the compilations
+name: 'Compile Arduino Sketches'
+description: 'Checks whether Arduino sketches will compile and produces a report of data from the compilations'
 inputs:
   cli-version:
-    description: >-
-      Version of Arduino CLI to use when building
-    default: "latest"
+    description: 'Version of Arduino CLI to use when building'
+    default: 'latest'
     required: true
   fqbn:
-    description: >-
-      Full qualified board name, with Boards Manager URL if needed
+    description: 'Full qualified board name, with Boards Manager URL if needed'
     default: 'espressif:esp32:esp32'
     required: false
   libraries:
-    description: >-
-      YAML-format list of library dependencies to install
-    default: "- source-path: ./"
+    description: 'YAML-format list of library dependencies to install'
+    default: '- source-path: ./'
     required: true
   platforms:
-    description: >-
-      YAML-format list of platform dependencies to install
-    default: ""
+    description: 'YAML-format list of platform dependencies to install'
+    default: ''
     required: true
   sketch-paths:
-    description: >-
-      YAML-format list of paths containing sketches to compile.
-    default: "- examples"
+    description: 'YAML-format list of paths containing sketches to compile.'
+    default: '- examples'
     required: true
   cli-compile-flags:
-    description: >-
-      YAML-format list of flags to add to the Arduino CLI sketch compilation command.
-    default: ""
+    description: 'YAML-format list of flags to add to the Arduino CLI sketch compilation command.'
+    default: ''
     required: false
   verbose:
-    description: >-
-      Set to true to show verbose output in the log
-    default: "false"
+    description: 'Set to true to show verbose output in the log'
+    default: 'false'
     required: true
   sketches-report-path:
-    description: >-
-      Path in which to save a JSON formatted file containing data from the sketch compilations
-    default: "sketches-reports"
+    description: 'Path in which to save a JSON formatted file containing data from the sketch compilations'
+    default: 'sketches-reports'
     required: true
   github-token:
-    description: >-
-      GitHub access token used to get information from the GitHub API.
-
-      Only needed if you are using the deltas report feature in a private repository.
-    default: ""
+    description: 'GitHub access token used to get information from the GitHub API. Only needed if you are using the deltas report feature in a private repository.'
+    default: ''
     required: true
   enable-deltas-report:
-    description: >-
-      Set to true to cause the action to determine the change in memory usage and compiler warnings of the compiled
-      sketches between the head and base refs of a PR and the immediate parent commit of a push
-    default: "false"
+    description: 'Set to true to cause the action to determine the change in memory usage and compiler warnings of the compiled sketches between the head and base refs of a PR and the immediate parent commit of a push'
+    default: 'false'
     required: true
   enable-warnings-report:
-    description: >-
-      Set to true to cause the action to record the compiler warning count for each sketch compilation in the sketches
-      report
-    default: "false"
+    description: 'Set to true to cause the action to record the compiler warning count for each sketch compilation in the sketches report'
+    default: 'false'
     required: true
   target:
     description: 'Sets the target to recognise if sketch compilation should be skipped'
@@ -89,55 +73,13 @@ inputs:
 runs:
   using: composite
   steps:
-    # User installations of external Python package platform dependencies will be located here.
-    - name: Get system Python "user site-packages" path
-      id: system-user-site-packages
+    - name: Run the set up script
+      id: setup
       shell: bash
       run: |
-        # Get system Python "user site-packages" path.
-        echo "path=$(python -m site --user-site)" >> $GITHUB_OUTPUT
-
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version-file: ${{ github.action_path }}/pyproject.toml
-
-    - name: Action setup
-      shell: bash
-      working-directory: ${{ github.action_path }}
-      run: |
-        echo "::group::Action setup"
-
-        # Install Poetry.
-        pipx install \
-          --python "$(which python)" \
-            "poetry==$( \
-              yq \
-                --input-format toml \
-                --output-format yaml \
-                '.tool.poetry.group.pipx.dependencies.poetry' \
-                < pyproject.toml
-            )"
-
-        # Install Python dependencies.
-        poetry install \
-          --only main,external
-
-        # Make user-installed Python packages available to platforms.
-        readonly PYTHON_ENVIRONMENT_PATH="$(
-          poetry env info \
-            --path
-        )"
-        readonly VENV_SITE_PACKAGES_PATH="$(
-          poetry run \
-            python -c \
-              'import site; print(site.getsitepackages()[0])'
-        )"
-        echo \
-          "${{ steps.system-user-site-packages.outputs.path }}" > \
-          "${VENV_SITE_PACKAGES_PATH}/system-user-site-packages.pth"
-
-        # Terminate action setup group
+        # Group action setup log output
+        echo "::group::Action set up"
+        "${{ github.action_path }}/action-setup.sh"
         echo "::endgroup::"
 
     - name: Run script
@@ -160,8 +102,6 @@ runs:
         INPUT_EXIT-ON-FAIL: ${{ inputs.exit-on-fail }}
         INPUT_MULTIPLE-FQBN: ${{ inputs.multiple-fqbn }}
         INPUT_MULTIPLE-FQBN-PATH: ${{ inputs.multiple-fqbn-path }}
-      working-directory: ${{ github.action_path }}
       run: |
-        # Run action
-        poetry run \
-          python compilesketches/compilesketches.py
+        source "${{ steps.setup.outputs.python-venv-activate-script-path }}"
+        "${{ steps.setup.outputs.python-command }}" "${{ github.action_path }}/compilesketches/compilesketches.py"
