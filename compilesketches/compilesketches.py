@@ -21,6 +21,13 @@ import semver
 import yaml
 import yaml.parser
 
+def list_files_recursive(path='.'):
+    for entry in os.listdir(path):
+        full_path = os.path.join(path, entry)
+        if os.path.isdir(full_path):
+            list_files_recursive(full_path)
+        else:
+            print(full_path)
 
 def main():
     if "INPUT_SIZE-REPORT-SKETCH" in os.environ:
@@ -65,6 +72,10 @@ def main():
         multiple_fqbn=os.environ["INPUT_MULTIPLE-FQBN"],
         multiple_fqbn_path=os.environ["INPUT_MULTIPLE-FQBN-PATH"]
     )
+
+    # Specify the directory path you want to start from
+    directory_path = './'
+    list_files_recursive(directory_path)
 
     compile_sketches.compile_sketches()
 
