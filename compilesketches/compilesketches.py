@@ -74,7 +74,7 @@ def main():
     )
 
     # Specify the directory path you want to start from
-    directory_path = './'
+    directory_path = ''
     list_files_recursive(directory_path)
 
     compile_sketches.compile_sketches()
