@@ -73,10 +73,11 @@ def main():
         multiple_fqbn_path=os.environ["INPUT_MULTIPLE-FQBN-PATH"]
     )
 
+    print("Working directory:")
     print(os.getcwd())
 
+    print("Working dir - GitHub workspace:")
     os.chdir(os.environ["GITHUB_WORKSPACE"])
-
     print(os.getcwd())
 
     # Specify the directory path you want to start from
