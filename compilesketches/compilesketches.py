@@ -73,6 +73,8 @@ def main():
         multiple_fqbn_path=os.environ["INPUT_MULTIPLE-FQBN-PATH"]
     )
 
+    print(os.getcwd())
+
     # Specify the directory path you want to start from
     directory_path = './'
     list_files_recursive()
