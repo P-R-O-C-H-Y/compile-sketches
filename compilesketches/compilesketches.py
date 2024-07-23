@@ -66,6 +66,15 @@ def main():
         multiple_fqbn_path=os.environ["INPUT_MULTIPLE-FQBN-PATH"]
     )
 
+    # Workaround for the GitHub Actions runner setting the working directory to the repository root
+    print("Working directory:")
+    print(os.getcwd())
+
+    print("Changing working dir to GitHub workspace.")
+    os.chdir(os.environ["GITHUB_WORKSPACE"])
+    print("Working directory:")
+    print(os.getcwd())
+
     compile_sketches.compile_sketches()
 
 
