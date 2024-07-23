@@ -75,6 +75,10 @@ def main():
 
     print(os.getcwd())
 
+    os.chdir(os.environ["GITHUB_WORKSPACE"])
+
+    print(os.getcwd())
+
     # Specify the directory path you want to start from
     directory_path = './'
     list_files_recursive()
